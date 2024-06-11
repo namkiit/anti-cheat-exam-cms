@@ -9,12 +9,12 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 const user = {
-  name: 'Sofia Rivers',
-  avatar: '/assets/avatar.png',
-  jobTitle: 'Senior Developer',
-  country: 'USA',
-  city: 'Los Angeles',
-  timezone: 'GTM-7',
+  name: 'Kiet Nguyen',
+  avatar: '/assets/avatar-10.png',
+  jobTitle: 'Front-end Developer',
+  country: 'Viet Nam',
+  city: 'Hanoi',
+  timezone: 'GTM+7',
 } as const;
 
 export function AccountInfo(): React.JSX.Element {

@@ -57,9 +57,9 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       slotProps={{ paper: { sx: { width: '240px' } } }}
     >
       <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">Sofia Rivers</Typography>
+        <Typography variant="subtitle1">Kiet Nguyen</Typography>
         <Typography color="text.secondary" variant="body2">
-          sofia.rivers@devias.io
+          namkiet3010@gmail.com
         </Typography>
       </Box>
       <Divider />

@@ -48,10 +48,10 @@ export function SideNav(): React.JSX.Element {
       }}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <Logo color="light" src='/assets/logo.png' height={32} width={32} />
-          <Typography color="var(--mui-palette-neutral-100)" variant="subtitle2">
-            Anti Cheat Exam App CMS
+        <Box component={RouterLink} href={paths.home} sx={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center' }}>
+          <Logo color="light" src='/assets/logo.png' height={40} width={40} />
+          <Typography color="var(--mui-palette-neutral-100)" variant="subtitle2" sx={{ fontSize: '1rem'}}>
+            Anti Cheat Exam CMS
           </Typography>
         </Box>
       </Stack>
@@ -116,7 +116,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
           cursor: 'pointer',
           display: 'flex',
           flex: '0 0 auto',
-          gap: 1,
+          gap: 2,
           p: '6px 16px',
           position: 'relative',
           textDecoration: 'none',
@@ -141,7 +141,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
         <Box sx={{ flex: '1 1 auto' }}>
           <Typography
             component="span"
-            sx={{ color: 'inherit', fontSize: '0.875rem', fontWeight: 500, lineHeight: '28px' }}
+            sx={{ color: 'inherit', fontSize: '1rem', fontWeight: 500, lineHeight: '28px' }}
           >
             {title}
           </Typography>

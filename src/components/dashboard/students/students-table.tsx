@@ -27,6 +27,8 @@ export interface Student {
   fname: string;
   lname: string;
   password: string;
+  assignedExams: string[];
+  submittedExams: string[];
   createdAt: Date;
 }
 
@@ -44,7 +46,7 @@ export function StudentsTable({
   rowsPerPage = 0,
 }: StudentTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
-    return rows.map((customer) => customer.id);
+    return rows.map((student) => student.id);
   }, [rows]);
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
@@ -73,6 +75,8 @@ export function StudentsTable({
               </TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Password</TableCell>
+              <TableCell>Assigned Exams</TableCell>
+              <TableCell>Submitted Exams</TableCell>
               <TableCell>Created At</TableCell>
             </TableRow>
           </TableHead>
@@ -101,6 +105,8 @@ export function StudentsTable({
                     </Stack>
                   </TableCell>
                   <TableCell>{row.password}</TableCell>
+                  <TableCell>{row.assignedExams}</TableCell>
+                  <TableCell>{row.submittedExams}</TableCell>
                   <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
                 </TableRow>
               );
