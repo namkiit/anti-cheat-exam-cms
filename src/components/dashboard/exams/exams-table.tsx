@@ -33,6 +33,14 @@ export interface Exam {
   createdAt: Date;
 }
 
+export interface AssignedExam {
+  examId: string;
+}
+
+export interface SubmittedExam extends AssignedExam {
+  answers: any[];
+}
+
 interface ExamsTableProps {
   count?: number;
   page?: number;
@@ -74,6 +82,7 @@ export function ExamsTable({
                   }}
                 />
               </TableCell>
+              <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Question Count</TableCell>
               <TableCell>Duration</TableCell>
@@ -101,6 +110,7 @@ export function ExamsTable({
                       }}
                     />
                   </TableCell>
+                  <TableCell>{row.id}</TableCell>
                   <TableCell>
                     <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
                       {/* <Avatar  /> */}

@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 
 import { useSelection } from '@/hooks/use-selection';
+import { AssignedExam } from '../exams/exams-table';
 
 function noop(): void {
   // do nothing
@@ -27,8 +28,8 @@ export interface Student {
   fname: string;
   lname: string;
   password: string;
-  assignedExams: string[];
-  submittedExams: string[];
+  assignedExams: AssignedExam[];
+  submittedExams: object[];
   createdAt: Date;
 }
 
@@ -73,6 +74,7 @@ export function StudentsTable({
                   }}
                 />
               </TableCell>
+              <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Password</TableCell>
               <TableCell>Assigned Exams</TableCell>
@@ -98,15 +100,16 @@ export function StudentsTable({
                       }}
                     />
                   </TableCell>
+                  <TableCell>{row.id}</TableCell>
                   <TableCell>
                     <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
                       {/* <Avatar  /> */}
                       <Typography variant="subtitle2">{row.fname} {row.lname}</Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell>{row.password}</TableCell>
-                  <TableCell>{row.assignedExams}</TableCell>
-                  <TableCell>{row.submittedExams}</TableCell>
+                  <TableCell>{'*'.repeat(row.password.length)}</TableCell>
+                  <TableCell>{row.assignedExams.map((exam) => { return exam.examId }).join(', ')}</TableCell>
+                  <TableCell>{row.submittedExams.map((exam) => { return exam.examId }).join(', ')}</TableCell>
                   <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
                 </TableRow>
               );

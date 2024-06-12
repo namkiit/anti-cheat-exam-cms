@@ -17,7 +17,17 @@ const students = [
     fname: "Kiet",
     lname: "Nguyen",
     password: "namkiet3010",
-    assignedExams: [ "220001", "220002", "220003" ],
+    assignedExams: [
+      {
+        examId: "220001"
+      },
+      {
+        examId: "220002"
+      },
+      {
+        examId: "220003"
+      }
+    ],
     submittedExams: [],
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
