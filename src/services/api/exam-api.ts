@@ -5,21 +5,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable no-useless-catch */
+import { type Exam } from "@/components/dashboard/exams/exams-table";
 import axiosInstance from "../axiosInstance";
 
-const getExam = async (studentId: string, examId: string, token: string) => {
+const getAllExams = async (): Promise<Exam[]> => {
   try {
-    const res = await axiosInstance.get(`/${studentId}/exam/${examId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const res = await axiosInstance.get(`/exams/`, {
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      // },
     });
 
     const data: any = res.data;
 
-    if (res.status >= 200 && res.status < 300 || data.err) {
-      throw new Error(data.err || "Failed to get exam from server!");
-    }
+    // if (res.status >= 200 && res.status < 300 || data.err) {
+    //   throw new Error(data.err || "Failed to get exam from server!");
+    // }
 
     return data;
   } catch (e) {
@@ -27,24 +28,4 @@ const getExam = async (studentId: string, examId: string, token: string) => {
   }
 };
 
-const getAssignedExams = async (userId: string, token: string) => {
-  try {
-    const res = await axiosInstance.get(`/${userId}/assignedExams/all`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data: any = res.data;
-
-    if (res.status >= 200 && res.status < 300 || data.err) {
-      throw new Error(data.err || "Failed to get assigned exams from server!");
-    }
-
-    return data.exams;
-  } catch (e) {
-    throw e;
-  }
-};
-
-export { getExam, getAssignedExams };
+export { getAllExams };

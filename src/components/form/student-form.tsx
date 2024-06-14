@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react';
 import Modal from '@mui/material/Modal';
 import Backdrop from '@mui/material/Backdrop';
@@ -9,7 +11,10 @@ import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import { Alert, Button, FormControl, FormHelperText, Grid, OutlinedInput } from '@mui/material';
 import { z as zod } from 'zod';
+import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Student } from '../dashboard/students/students-table';
+import { createStudent } from '@/services/api/student-api';
 // import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 // import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 
@@ -31,21 +36,30 @@ const schema = zod.object({
     fname: zod.string().min(1, { message: 'First Name is required' }),
     lname: zod.string().min(1, { message: 'Last Name is required' }),
     password: zod.string().min(1, { message: 'Password is required' }),
+    assignedExams: zod.string().optional()
 });
 
 type Values = zod.infer<typeof schema>;
 
-export function StudentForm({ open, handleClose }: { open: boolean, handleClose: () => void }): React.JSX.Element {
+export function StudentForm({ open, title, data, handleClose }: { open: boolean, title: string, data?: Student, handleClose: () => void }): React.JSX.Element {
     const {
         control,
         handleSubmit,
+        // setValue,
         // setError,
-        // formState: { errors },
+        formState: { errors },
     } = useForm<Values>({ resolver: zodResolver(schema) });
 
-    const onSubmit = () => {
-        console.log('submit form')
-    }
+    const onSubmit = React.useCallback(
+        async (values: Values): Promise<void> => {
+          console.log(values)
+          const { id, fname, lname, password, assignedExams } = values;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
+          const res = await createStudent(id, fname, lname, password, assignedExams)
+          console.log(res)
+        },
+        []
+      );
 
     return (
         <Modal
@@ -65,51 +79,73 @@ export function StudentForm({ open, handleClose }: { open: boolean, handleClose:
                 <Box sx={style}>
                     <Stack spacing={4}>
                         <Typography id="transition-modal-title" variant="h4" component="h2">
-                            Add Student
+                            {title}
                         </Typography>
 
                         <form onSubmit={handleSubmit(onSubmit)} className="">
                             <Stack spacing={2}>
                                 <Controller
                                     control={control}
+                                    // defaultValue={data?._id}
                                     name="id"
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.id)}>
                                             <InputLabel>ID</InputLabel>
                                             <OutlinedInput {...field} label="ID" type="text" />
+                                            {errors.id ? <FormHelperText>{errors.id.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
                                 <Controller
                                     control={control}
+                                    // defaultValue={data?.fname}
                                     name="fname"
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.fname)}>
                                             <InputLabel>First Name</InputLabel>
                                             <OutlinedInput {...field} label="First Name" type="text" />
+                                            {errors.fname ? <FormHelperText>{errors.fname.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
                                 <Controller
                                     control={control}
+                                    // defaultValue={data?.lname}
                                     name="lname"
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.lname)}>
                                             <InputLabel>Last Name</InputLabel>
                                             <OutlinedInput {...field} label="Last Name" type="text" />
+                                            {errors.lname ? <FormHelperText>{errors.lname.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
                                 <Controller
                                     control={control}
+                                    // defaultValue={data?.password}
                                     name="password"
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.password)}>
                                             <InputLabel>Password</InputLabel>
-                                            <OutlinedInput {...field} label="Duration" type="text" />
+                                            <OutlinedInput {...field} label="Password" type="text" />
+                                            {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
+                                <Controller
+                                    control={control}
+                                    defaultValue={data?.assignedExams.map((exam) => { return exam.examId }).join(', ')}
+                                    name="assignedExams"
+                                    render={({ field }) => (
+                                        <FormControl>
+                                            <InputLabel>Assigned Exams (input as a multiple strings separated by comma)</InputLabel>
+                                            <OutlinedInput {...field} label="Assigned Exams (input as a multiple strings separated by comma)" type="text" />
+                                        </FormControl>
+                                    )}
+                                />
+                                <Button variant="contained" type="submit" sx={{ mt: 2 }}>
+                                    {title}
+                                </Button>
                             </Stack>
                         </form>
                     </Stack>

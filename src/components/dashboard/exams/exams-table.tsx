@@ -14,16 +14,18 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import dayjs from 'dayjs';
 
 import { useSelection } from '@/hooks/use-selection';
+import { ExamForm } from '@/components/form/exam-form';
 
 function noop(): void {
   // do nothing
 }
 
 export interface Exam {
-  id: string;
+  _id: string;
   name: string;
   questionCount: number;
   duration: number;
@@ -55,8 +57,10 @@ export function ExamsTable({
   rowsPerPage = 0,
 }: ExamsTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
-    return rows.map((exam) => exam.id);
+    return rows.map((row) => row._id);
   }, [rows]);
+
+  const [open, setOpen] = React.useState(false)
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
 
@@ -90,27 +94,29 @@ export function ExamsTable({
               <TableCell>Start Date</TableCell>
               <TableCell>End Date</TableCell>
               <TableCell>Created At</TableCell>
+              <TableCell />
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => {
-              const isSelected = selected?.has(row.id);
+              const isSelected = selected?.has(row._id);
 
               return (
-                <TableRow hover key={row.id} selected={isSelected}>
+                <TableRow hover key={row._id} selected={isSelected}>
                   <TableCell padding="checkbox">
                     <Checkbox
                       checked={isSelected}
                       onChange={(event) => {
                         if (event.target.checked) {
-                          selectOne(row.id);
+                          selectOne(row._id);
                         } else {
-                          deselectOne(row.id);
+                          deselectOne(row._id);
                         }
                       }}
                     />
                   </TableCell>
-                  <TableCell>{row.id}</TableCell>
+                  <TableCell>{row._id}</TableCell>
                   <TableCell>
                     <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
                       {/* <Avatar  /> */}
@@ -126,6 +132,12 @@ export function ExamsTable({
                     {row.address.city}, {row.address.state}, {row.address.country}
                   </TableCell> */}
                   <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
+                  <TableCell>
+                    <Button variant="contained" onClick={() => { setOpen(true) }}>Edit</Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outlined" color="error">Delete</Button>
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -142,6 +154,7 @@ export function ExamsTable({
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      <ExamForm open={open} title='Edit Exam' handleClose={() => { setOpen(false) }} />
     </Card>
   );
 }

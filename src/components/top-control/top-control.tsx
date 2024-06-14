@@ -7,7 +7,6 @@ import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import Button from '@mui/material/Button';
 import { ExamForm } from '@/components/form/exam-form';
 import { StudentForm } from '@/components//form/student-form';
-import { QuestionForm } from '@/components/form/question-form';
 
 export function TopControl({ title }: { title: string }): React.JSX.Element {
     const [open, setOpen] = React.useState(false)
@@ -22,9 +21,8 @@ export function TopControl({ title }: { title: string }): React.JSX.Element {
                     Add
                 </Button>
             </div>
-            {title === 'Exams' && (<ExamForm open={open} handleClose={() => { setOpen(false) }} />)}
-            {title === 'Questions' && (<QuestionForm open={open} handleClose={() => { setOpen(false) }} />)}
-            {title === 'Students' && (<StudentForm open={open} handleClose={() => { setOpen(false) }} />)}
+            {title === 'Exams' && (<ExamForm open={open} title='Add Exam' handleClose={() => { setOpen(false) }} />)}
+            {title === 'Students' && (<StudentForm open={open} title='Add Student' handleClose={() => { setOpen(false) }} />)}
         </Stack>
     );
 }

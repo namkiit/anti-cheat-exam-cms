@@ -15,16 +15,21 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
+import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 import { useSelection } from '@/hooks/use-selection';
 import { AssignedExam } from '../exams/exams-table';
+import { StudentForm } from '@/components/form/student-form';
+import { Toast } from '@/components/toast/toast';
 
 function noop(): void {
   // do nothing
 }
 
 export interface Student {
-  id: string;
+  _id: string;
   fname: string;
   lname: string;
   password: string;
@@ -47,8 +52,19 @@ export function StudentsTable({
   rowsPerPage = 0,
 }: StudentTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
-    return rows.map((student) => student.id);
+    return rows.map((row) => row._id);
   }, [rows]);
+
+  const [open, setOpen] = React.useState(false)
+  const [studentToEdit, setStudentToEdit] = React.useState<Student>({
+    _id: '',
+    fname: '',
+    lname: '',
+    password: '',
+    assignedExams: [],
+    submittedExams: [],
+    createdAt: new Date(),
+  })
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
 
@@ -77,30 +93,32 @@ export function StudentsTable({
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Password</TableCell>
-              <TableCell>Assigned Exams</TableCell>
-              <TableCell>Submitted Exams</TableCell>
+              <TableCell>Number of Assigned Exams</TableCell>
+              <TableCell>Number of Submitted Exams</TableCell>
               <TableCell>Created At</TableCell>
+              <TableCell />
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => {
-              const isSelected = selected?.has(row.id);
+              const isSelected = selected?.has(row._id);
 
               return (
-                <TableRow hover key={row.id} selected={isSelected}>
+                <TableRow hover key={row._id} selected={isSelected}>
                   <TableCell padding="checkbox">
                     <Checkbox
                       checked={isSelected}
                       onChange={(event) => {
                         if (event.target.checked) {
-                          selectOne(row.id);
+                          selectOne(row._id);
                         } else {
-                          deselectOne(row.id);
+                          deselectOne(row._id);
                         }
                       }}
                     />
                   </TableCell>
-                  <TableCell>{row.id}</TableCell>
+                  <TableCell>{row._id}</TableCell>
                   <TableCell>
                     <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
                       {/* <Avatar  /> */}
@@ -108,9 +126,18 @@ export function StudentsTable({
                     </Stack>
                   </TableCell>
                   <TableCell>{'*'.repeat(row.password.length)}</TableCell>
-                  <TableCell>{row.assignedExams.map((exam) => { return exam.examId }).join(', ')}</TableCell>
-                  <TableCell>{row.submittedExams.map((exam) => { return exam.examId }).join(', ')}</TableCell>
+                  <TableCell>{row.assignedExams.map((exam) => { return exam.examId }).length}</TableCell>
+                  <TableCell>{row.submittedExams.map((exam) => { return exam.examId }).length}</TableCell>
                   <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
+                  <TableCell>
+                    <Button variant="contained" onClick={() => {
+                      setOpen(true)
+                      setStudentToEdit(row)
+                    }}>Edit</Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outlined" color="error">Delete</Button>
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -127,6 +154,8 @@ export function StudentsTable({
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      <StudentForm open={open} title='Edit Student' handleClose={() => { setOpen(false) }} data={studentToEdit} />
+      <Toast message="Hello" type="success" position="bottom-right" />
     </Card>
   );
 }

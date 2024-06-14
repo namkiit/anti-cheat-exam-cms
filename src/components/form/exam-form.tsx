@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react';
 import Modal from '@mui/material/Modal';
 import Backdrop from '@mui/material/Backdrop';
@@ -43,7 +45,7 @@ const schema = zod.object({
 type Values = zod.infer<typeof schema>;
 const defaultValues = { id: '', name: '', questionCount: 0, duration: 0, status: '', startDate: '', endDate: '' } satisfies Values;
 
-export function ExamForm({ open, handleClose }: { open: boolean, handleClose: () => void }): React.JSX.Element {
+export function ExamForm({ open, title, handleClose }: { open: boolean, title: string, handleClose: () => void }): React.JSX.Element {
     const {
         control,
         handleSubmit,
@@ -73,7 +75,7 @@ export function ExamForm({ open, handleClose }: { open: boolean, handleClose: ()
                 <Box sx={style}>
                     <Stack spacing={4}>
                         <Typography id="transition-modal-title" variant="h4" component="h2">
-                            Add Exam
+                            {title}
                         </Typography>
 
                         <form onSubmit={handleSubmit(onSubmit)} className="">
