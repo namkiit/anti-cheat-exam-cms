@@ -12,8 +12,8 @@ import Stack from '@mui/material/Stack';
 import { Button, FormControl, FormHelperText, OutlinedInput } from '@mui/material';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type Student } from '../dashboard/students/students-table';
-import { createStudent, updateStudent } from '@/services/api/student-api';
+import { type Question } from '../dashboard/questions/questions-table';
+import { createQuestion, updateQuestion } from '@/services/api/question-api';
 // import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 // import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 
@@ -32,15 +32,21 @@ const style = {
 const schema = zod.object({
     // email: zod.string().min(1, { message: 'Email is required' }).email(),
     id: zod.string().min(1, { message: 'ID is required' }),
-    fname: zod.string().min(1, { message: 'First Name is required' }),
-    lname: zod.string().min(1, { message: 'Last Name is required' }),
-    password: zod.string().min(1, { message: 'Password is required' }),
-    assignedExams: zod.string().optional()
+    title: zod.string().min(1, { message: 'Title is required' }),
+    type: zod.string().min(1, { message: 'Type is required' }),
+    answers: zod.object({
+        a: zod.string(),
+        b: zod.string(),
+        c: zod.string(),
+        d: zod.string(),
+        // Add more properties as needed
+    }),
+    correctAnswer: zod.string().min(1, { message: 'Correct Answer is required' }),
 });
 
 type Values = zod.infer<typeof schema>;
 
-export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessageToast }: { open: boolean, title: string, data?: Student, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void }): React.JSX.Element {
+export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToast, setMessageToast }: { open: boolean, title: string, data?: Question, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void }): React.JSX.Element {
     const {
         control,
         handleSubmit,
@@ -53,37 +59,37 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
     const onSubmit = React.useCallback(
         async (values: Values): Promise<void> => {
             console.log(values);
-            const { id, fname, lname, password, assignedExams } = values;
+            const { id, title, type, answers, correctAnswer } = values;
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- disable warning
-                const res = isEditMode ? await updateStudent(id, fname, lname, password, assignedExams) : await createStudent(id, fname, lname, password, assignedExams);
+                const res = isEditMode ? await updateQuestion(id, title, type, answers, correctAnswer) : await createQuestion(id, title, type, answers, correctAnswer);
                 console.log(res);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
                 if (res.status === 'success') {
-                    setMessageToast(`${title} successful`);
+                    setMessageToast(`${titleForm} successful`);
                     setOpenToast(true);
                     setOpen(false);
                 } else {
-                    setMessageToast(`${title} failed`);
+                    setMessageToast(`${titleForm} failed`);
                     setOpenToast(true);
                 }
             } catch (error) {
-                console.error(`Error ${title}:`, error);
-                setMessageToast(`${title} failed`);
+                console.error(`Error ${titleForm}:`, error);
+                setMessageToast(`${titleForm} failed`);
                 setOpenToast(true);
             }
         },
-        [isEditMode, setMessageToast, setOpen, setOpenToast, title]
+        [isEditMode, setMessageToast, setOpen, setOpenToast, titleForm]
     );
 
     React.useEffect(() => {
         if (data) {
             reset({
                 id: data._id,
-                fname: data.fname,
-                lname: data.lname,
-                password: data.password,
-                assignedExams: data.assignedExams.map((exam) => exam.examId).join(', '),
+                title: data.title,
+                type: data.type,
+                answers: data.answers,
+                correctAnswer: data.correctAnswer,
             });
         }
     }, [data, reset]);
@@ -106,7 +112,7 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                 <Box sx={style}>
                     <Stack spacing={4}>
                         <Typography id="transition-modal-title" variant="h4" component="h2">
-                            {title}
+                            {titleForm}
                         </Typography>
 
                         <form onSubmit={handleSubmit(onSubmit)} className="">
@@ -125,53 +131,53 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                                 />
                                 <Controller
                                     control={control}
-                                    defaultValue={data?.fname}
-                                    name="fname"
+                                    defaultValue={data?.title}
+                                    name="title"
                                     render={({ field }) => (
-                                        <FormControl error={Boolean(errors.fname)}>
-                                            <InputLabel>First Name</InputLabel>
+                                        <FormControl error={Boolean(errors.title)}>
+                                            <InputLabel>Title</InputLabel>
                                             <OutlinedInput {...field} label="First Name" type="text" />
-                                            {errors.fname ? <FormHelperText>{errors.fname.message}</FormHelperText> : null}
+                                            {errors.title ? <FormHelperText>{errors.title.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
                                 <Controller
                                     control={control}
-                                    defaultValue={data?.lname}
-                                    name="lname"
+                                    defaultValue={data?.type}
+                                    name="type"
                                     render={({ field }) => (
-                                        <FormControl error={Boolean(errors.lname)}>
-                                            <InputLabel>Last Name</InputLabel>
+                                        <FormControl error={Boolean(errors.type)}>
+                                            <InputLabel>Type</InputLabel>
                                             <OutlinedInput {...field} label="Last Name" type="text" />
-                                            {errors.lname ? <FormHelperText>{errors.lname.message}</FormHelperText> : null}
+                                            {errors.type ? <FormHelperText>{errors.type.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
                                 <Controller
                                     control={control}
-                                    defaultValue={data?.password}
-                                    name="password"
+                                    defaultValue={data?.correctAnswer}
+                                    name="correctAnswer"
                                     render={({ field }) => (
-                                        <FormControl error={Boolean(errors.password)}>
-                                            <InputLabel>Password</InputLabel>
-                                            <OutlinedInput {...field} label="Password" type="text" />
-                                            {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
+                                        <FormControl error={Boolean(errors.correctAnswer)}>
+                                            <InputLabel>Correct Answer</InputLabel>
+                                            <OutlinedInput {...field} label="Correct Answer" type="text" />
+                                            {errors.correctAnswer ? <FormHelperText>{errors.correctAnswer.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
                                 <Controller
                                     control={control}
-                                    defaultValue={data?.assignedExams.map((exam) => { return exam.examId }).join(', ')}
-                                    name="assignedExams"
+                                    defaultValue={data?.answers}
+                                    name="answers"
                                     render={({ field }) => (
                                         <FormControl>
-                                            <InputLabel>Assigned Exams (input as a multiple strings separated by comma)</InputLabel>
+                                            <InputLabel>Answers</InputLabel>
                                             <OutlinedInput {...field} label="Assigned Exams (input as a multiple strings separated by comma)" type="text" />
                                         </FormControl>
                                     )}
                                 />
                                 <Button variant="contained" type="submit" sx={{ mt: 2 }}>
-                                    {title}
+                                    {titleForm}
                                 </Button>
                             </Stack>
                         </form>

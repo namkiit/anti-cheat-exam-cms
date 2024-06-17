@@ -6,9 +6,9 @@ import Stack from '@mui/material/Stack';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import Button from '@mui/material/Button';
 import { ExamForm } from '@/components/form/exam-form';
-import { StudentForm } from '@/components//form/student-form';
+import { StudentForm } from '@/components/form/student-form';
 
-export function TopControl({ title }: { title: string }): React.JSX.Element {
+export function TopControl({ title, setOpenToast, setMessageToast }: { title: string, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void }): React.JSX.Element {
     const [open, setOpen] = React.useState(false)
 
     return (
@@ -22,7 +22,7 @@ export function TopControl({ title }: { title: string }): React.JSX.Element {
                 </Button>
             </div>
             {title === 'Exams' && (<ExamForm open={open} title='Add Exam' handleClose={() => { setOpen(false) }} />)}
-            {title === 'Students' && (<StudentForm open={open} title='Add Student' handleClose={() => { setOpen(false) }} />)}
+            {title === 'Students' && (<StudentForm open={open} title='Add Student' setOpen={setOpen} setOpenToast={setOpenToast} setMessageToast={setMessageToast} />)}
         </Stack>
     );
 }

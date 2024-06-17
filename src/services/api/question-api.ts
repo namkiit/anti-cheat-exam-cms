@@ -5,13 +5,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable no-useless-catch */
-import { type Student } from '@/components/dashboard/students/students-table';
+import { type Question } from '@/components/dashboard/questions/questions-table';
 
 import axiosInstance from '../axiosInstance';
 
-const getAllStudents = async (): Promise<Student[]> => {
+const getAllQuestions = async (): Promise<Question[]> => {
   try {
-    const res = await axiosInstance.get(`/students/`, {
+    const res = await axiosInstance.get(`/questions/`, {
       // headers: {
       //   Authorization: `Bearer ${token}`,
       // },
@@ -29,27 +29,19 @@ const getAllStudents = async (): Promise<Student[]> => {
   }
 };
 
-const createStudent = async (
-  id: string,
-  fname: string,
-  lname: string,
-  password: string,
-  assignedExams: string | undefined
-) => {
+const createQuestion = async (id: string, title: string, type: string, answers: object, correctAnswer: string) => {
   try {
-    const res = await axiosInstance.post(`/student/create`, {
+    const res = await axiosInstance.post(`/question/create`, {
       // headers: {
       //   Authorization: `Bearer ${token}`,
       // },
       _id: id,
-      fname,
-      lname,
-      password,
-      assignedExams: assignedExams?.split(',').map((examId) => ({
-        examId: examId.trim(),
-      })),
+      title,
+      type,
+      answers,
+      correctAnswer
     });
-    
+
     const data: any = res.data;
 
     // if (res.status >= 200 && res.status < 300 || data.err) {
@@ -62,27 +54,19 @@ const createStudent = async (
   }
 };
 
-const updateStudent = async (
-  id: string,
-  fname: string,
-  lname: string,
-  password: string,
-  assignedExams: string | undefined
-) => {
+const updateQuestion = async (id: string, title: string, type: string, answers: object, correctAnswer: string) => {
   try {
-    const res = await axiosInstance.post(`/student/update`, {
+    const res = await axiosInstance.post(`/question/update`, {
       // headers: {
       //   Authorization: `Bearer ${token}`,
       // },
       _id: id,
-      fname,
-      lname,
-      password,
-      assignedExams: assignedExams?.split(',').map((examId) => ({
-        examId: examId.trim(),
-      })),
+      title,
+      type,
+      answers,
+      correctAnswer
     });
-    
+
     const data: any = res.data;
 
     // if (res.status >= 200 && res.status < 300 || data.err) {
@@ -95,15 +79,14 @@ const updateStudent = async (
   }
 };
 
-
-const deleteStudent = async (id: string) => {
+const deleteQuestion = async (id: string) => {
   try {
-    const res = await axiosInstance.delete(`/student/${id}`, {
+    const res = await axiosInstance.delete(`/question/${id}`, {
       // headers: {
       //   Authorization: `Bearer ${token}`,
       // },
     });
-    
+
     const data: any = res.data;
 
     // if (res.status >= 200 && res.status < 300 || data.err) {
@@ -116,4 +99,4 @@ const deleteStudent = async (id: string) => {
   }
 };
 
-export { getAllStudents, createStudent, updateStudent, deleteStudent };
+export { getAllQuestions, createQuestion, updateQuestion, deleteQuestion };
