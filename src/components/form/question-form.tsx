@@ -14,6 +14,7 @@ import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Question } from '../dashboard/questions/questions-table';
 import { createQuestion, updateQuestion } from '@/services/api/question-api';
+import { Severity } from '../toast/toast';
 // import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 // import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 
@@ -29,53 +30,62 @@ const style = {
     p: 4,
 };
 
+type AnswerFieldNames = 'answerA' | 'answerB' | 'answerC' | 'answerD';
+
+const answerFieldNames: AnswerFieldNames[] = ['answerA', 'answerB', 'answerC', 'answerD'];
+
+
 const schema = zod.object({
-    // email: zod.string().min(1, { message: 'Email is required' }).email(),
     id: zod.string().min(1, { message: 'ID is required' }),
     title: zod.string().min(1, { message: 'Title is required' }),
     type: zod.string().min(1, { message: 'Type is required' }),
-    answers: zod.object({
-        a: zod.string(),
-        b: zod.string(),
-        c: zod.string(),
-        d: zod.string(),
-        // Add more properties as needed
-    }),
-    correctAnswer: zod.string().min(1, { message: 'Correct Answer is required' }),
+    answerA: zod.string().min(1, { message: 'Answer A is required' }),
+    answerB: zod.string().min(1, { message: 'Answer B is required' }),
+    answerC: zod.string().min(1, { message: 'Answer C is required' }),
+    answerD: zod.string().min(1, { message: 'Answer D is required' }),
+    correctAnswer: zod.enum(['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D']),
 });
 
 type Values = zod.infer<typeof schema>;
 
-export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToast, setMessageToast }: { open: boolean, title: string, data?: Question, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void }): React.JSX.Element {
+export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToast, setMessageToast, setTypeToast }: { open: boolean, title: string, data?: Question, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void, setTypeToast: (type: Severity) => void }): React.JSX.Element {
     const {
         control,
         handleSubmit,
         reset,
         formState: { errors },
     } = useForm<Values>({ resolver: zodResolver(schema) });
-
     const isEditMode = Boolean(data);
 
     const onSubmit = React.useCallback(
         async (values: Values): Promise<void> => {
             console.log(values);
-            const { id, title, type, answers, correctAnswer } = values;
+            const { id, title, type, answerA, answerB, answerC, answerD, correctAnswer } = values;
+            const answerVariables = { answerA, answerB, answerC, answerD };
+            type AnswerKeys = keyof typeof answerVariables;
+            const answers = Object.keys(answerVariables).map((key, index) => {
+                const label = String.fromCharCode(97 + index); // Convert index to a corresponding letter (97 is 'a' in ASCII)
+                return { label, text: answerVariables[key as AnswerKeys] };
+            });
+
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- disable warning
                 const res = isEditMode ? await updateQuestion(id, title, type, answers, correctAnswer) : await createQuestion(id, title, type, answers, correctAnswer);
-                console.log(res);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
                 if (res.status === 'success') {
                     setMessageToast(`${titleForm} successful`);
+                    setTypeToast('success');
                     setOpenToast(true);
                     setOpen(false);
                 } else {
                     setMessageToast(`${titleForm} failed`);
+                    setTypeToast('error');
                     setOpenToast(true);
                 }
             } catch (error) {
                 console.error(`Error ${titleForm}:`, error);
                 setMessageToast(`${titleForm} failed`);
+                setTypeToast('error');
                 setOpenToast(true);
             }
         },
@@ -88,7 +98,10 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                 id: data._id,
                 title: data.title,
                 type: data.type,
-                answers: data.answers,
+                answerA: data.answers[0]?.text,
+                answerB: data.answers[1]?.text,
+                answerC: data.answers[2]?.text,
+                answerD: data.answers[3]?.text,
                 correctAnswer: data.correctAnswer,
             });
         }
@@ -124,7 +137,7 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                                     render={({ field }) => (
                                         <FormControl error={Boolean(errors.id)}>
                                             <InputLabel>ID</InputLabel>
-                                            <OutlinedInput {...field} label="ID" type="text" disabled={isEditMode} /> 
+                                            <OutlinedInput {...field} label="ID" type="text" disabled={isEditMode} />
                                             {errors.id ? <FormHelperText>{errors.id.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
@@ -136,7 +149,7 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                                     render={({ field }) => (
                                         <FormControl error={Boolean(errors.title)}>
                                             <InputLabel>Title</InputLabel>
-                                            <OutlinedInput {...field} label="First Name" type="text" />
+                                            <OutlinedInput {...field} label="Title" type="text" />
                                             {errors.title ? <FormHelperText>{errors.title.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
@@ -148,11 +161,26 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                                     render={({ field }) => (
                                         <FormControl error={Boolean(errors.type)}>
                                             <InputLabel>Type</InputLabel>
-                                            <OutlinedInput {...field} label="Last Name" type="text" />
+                                            <OutlinedInput {...field} label="Type" type="text" />
                                             {errors.type ? <FormHelperText>{errors.type.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
+                                {answerFieldNames.map((fieldName, index) => (
+                                    <Controller
+                                        key={fieldName}
+                                        control={control}
+                                        defaultValue={data?.answers ? data.answers[index]?.text : ''}
+                                        name={fieldName}
+                                        render={({ field }) => (
+                                            <FormControl error={Boolean(errors[fieldName])}>
+                                                <InputLabel>{`Answer ${String.fromCharCode(65 + index)}`}</InputLabel>
+                                                <OutlinedInput {...field} label={`Answer ${String.fromCharCode(65 + index)}`} type="text" />
+                                                {errors[fieldName] ? <FormHelperText>{errors[fieldName]?.message}</FormHelperText> : null}
+                                            </FormControl>
+                                        )}
+                                    />
+                                ))}
                                 <Controller
                                     control={control}
                                     defaultValue={data?.correctAnswer}
@@ -162,17 +190,6 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                                             <InputLabel>Correct Answer</InputLabel>
                                             <OutlinedInput {...field} label="Correct Answer" type="text" />
                                             {errors.correctAnswer ? <FormHelperText>{errors.correctAnswer.message}</FormHelperText> : null}
-                                        </FormControl>
-                                    )}
-                                />
-                                <Controller
-                                    control={control}
-                                    defaultValue={data?.answers}
-                                    name="answers"
-                                    render={({ field }) => (
-                                        <FormControl>
-                                            <InputLabel>Answers</InputLabel>
-                                            <OutlinedInput {...field} label="Assigned Exams (input as a multiple strings separated by comma)" type="text" />
                                         </FormControl>
                                     )}
                                 />

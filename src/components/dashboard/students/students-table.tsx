@@ -18,11 +18,11 @@ import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
 
 import { useSelection } from '@/hooks/use-selection';
-import { AssignedExam, SubmittedExam } from '../exams/exams-table';
+import { type AssignedExam, type SubmittedExam } from '../exams/exams-table';
 import { StudentForm } from '@/components/form/student-form';
 import { StudentsFilters } from '@/components/dashboard/students/students-filters';
 import { TopControl } from '@/components/top-control/top-control';
-import { Toast } from '@/components/toast/toast';
+import { type Severity, Toast } from '@/components/toast/toast';
 import { deleteStudent, getAllStudents } from '@/services/api/student-api';
 
 export interface Student {
@@ -39,10 +39,12 @@ export function StudentsTable(): React.JSX.Element {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+  const [allStudents, setAllStudents] = React.useState<Student[]>([]);
   const [rows, setRows] = React.useState<Student[]>([]);
   const [open, setOpen] = React.useState(false);
   const [openToast, setOpenToast] = React.useState<boolean>(false);
   const [messageToast, setMessageToast] = React.useState<string>('');
+  const [typeToast, setTypeToast] = React.useState<Severity>('success');
   const [studentToEdit, setStudentToEdit] = React.useState<Student>({
     _id: '',
     fname: '',
@@ -60,45 +62,50 @@ export function StudentsTable(): React.JSX.Element {
   const selectedAll = rows.length > 0 && selected?.size === rows.length;
 
   React.useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchStudents = async (): Promise<void> => {
       try {
         const students: Student[] = await getAllStudents();
-        const paginatedStudents = applyPagination(students, page, rowsPerPage);
-        setRows(paginatedStudents);
+        setAllStudents(students);
       } catch (error) {
         console.error('Error fetching students:', error);
       }
     };
 
     void fetchStudents();
-  }, [page, rowsPerPage, messageToast]);
+  }, [messageToast]);
 
-  const handleDeleteStudent = async (id: string) => {
+  React.useEffect(() => {
+    const paginatedStudents = applyPagination(allStudents, page, rowsPerPage);
+    setRows(paginatedStudents);
+  }, [allStudents, page, rowsPerPage]);
+
+  const handleDeleteStudent = async (id: string): Promise<void> => {
     try {
       await deleteStudent(id);
-      const updatedRows = rows.filter((row) => row._id !== id);
-      setRows(updatedRows);
       setMessageToast('Delete student successfully');
+      setTypeToast('success');
       setOpenToast(true);
+      setAllStudents(allStudents.filter((student) => student._id !== id));
     } catch (error) {
       console.error('Error deleting student:', error);
       setMessageToast('Failed to delete student');
+      setTypeToast('error');
       setOpenToast(true);
     }
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (event: unknown, newPage: number): void => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   return (
     <Stack spacing={3}>
-      <TopControl title="Students" setOpenToast={setOpenToast} setMessageToast={setMessageToast} />
+      <TopControl title="Students" setOpenToast={setOpenToast} setMessageToast={setMessageToast} setTypeToast={setTypeToast}/>
       <StudentsFilters />
       <Card>
         <Box sx={{ overflowX: 'auto' }}>
@@ -154,8 +161,8 @@ export function StudentsTable(): React.JSX.Element {
                       </Stack>
                     </TableCell>
                     <TableCell>{'*'.repeat(row.password.length)}</TableCell>
-                    <TableCell>{row.assignedExams.map((exam) => { return exam.examId }).length}</TableCell>
-                    <TableCell>{row.submittedExams.map((exam) => { return exam.examId }).length}</TableCell>
+                    <TableCell>{row.assignedExams.length}</TableCell>
+                    <TableCell>{row.submittedExams.length}</TableCell>
                     <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
                     <TableCell>
                       <Button variant="contained" onClick={() => {
@@ -175,15 +182,15 @@ export function StudentsTable(): React.JSX.Element {
         <Divider />
         <TablePagination
           component="div"
-          count={rows.length}
+          count={allStudents.length}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           page={page}
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[5, 10, 25]}
         />
-        <StudentForm open={open} title='Edit Student' data={studentToEdit} setOpen={setOpen} setOpenToast={setOpenToast} setMessageToast={setMessageToast} />
-        <Toast message={messageToast} type="success" position="bottom-right" open={openToast} setOpen={setOpenToast} />
+        <StudentForm open={open} title='Edit Student' data={studentToEdit} setOpen={setOpen} setOpenToast={setOpenToast} setMessageToast={setMessageToast} setTypeToast={setTypeToast} />
+        <Toast message={messageToast} type={typeToast} position="bottom-right" open={openToast} setOpen={setOpenToast} />
       </Card>
     </Stack>
   );

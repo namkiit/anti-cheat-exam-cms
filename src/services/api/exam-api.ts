@@ -28,4 +28,76 @@ const getAllExams = async (): Promise<Exam[]> => {
   }
 };
 
-export { getAllExams };
+const createExam = async (id: string, name: string, questions: string, duration: number, startDate: string, endDate: string) => {
+  try {
+    const res = await axiosInstance.post(`/exam/create`, {
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      // },
+      _id: id,
+      name,
+      questions: questions?.split(',').map(questionId => questionId.trim()),
+      duration,
+      startDate,
+      endDate
+    });
+
+    const data: any = res.data;
+
+    // if (res.status >= 200 && res.status < 300 || data.err) {
+    //   throw new Error(data.err || "Failed to get exam from server!");
+    // }
+
+    return data;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const updateExam = async (id: string, name: string, questions: string, duration: number, startDate: string, endDate: string) => {
+  try {
+    const res = await axiosInstance.post(`/exam/update`, {
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      // },
+      _id: id,
+      name,
+      questions: questions?.split(',').map(questionId => questionId.trim()),
+      duration,
+      startDate,
+      endDate
+    });
+
+    const data: any = res.data;
+
+    // if (res.status >= 200 && res.status < 300 || data.err) {
+    //   throw new Error(data.err || "Failed to get exam from server!");
+    // }
+
+    return data;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const deleteExam = async (id: string) => {
+  try {
+    const res = await axiosInstance.delete(`/exam/${id}`, {
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      // },
+    });
+
+    const data: any = res.data;
+
+    // if (res.status >= 200 && res.status < 300 || data.err) {
+    //   throw new Error(data.err || "Failed to get exam from server!");
+    // }
+
+    return data;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export { getAllExams, createExam, updateExam, deleteExam };

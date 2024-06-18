@@ -2,7 +2,7 @@ import * as React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-type Severity = "success" | "error" | "warning" | "info";
+export type Severity = "success" | "error" | "warning" | "info";
 
 type Position = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 

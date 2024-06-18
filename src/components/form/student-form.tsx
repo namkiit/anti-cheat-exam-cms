@@ -14,6 +14,7 @@ import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Student } from '../dashboard/students/students-table';
 import { createStudent, updateStudent } from '@/services/api/student-api';
+import { Severity } from '../toast/toast';
 // import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 // import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 
@@ -40,7 +41,7 @@ const schema = zod.object({
 
 type Values = zod.infer<typeof schema>;
 
-export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessageToast }: { open: boolean, title: string, data?: Student, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void }): React.JSX.Element {
+export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessageToast, setTypeToast }: { open: boolean, title: string, data?: Student, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void, setTypeToast: (type: Severity) => void }): React.JSX.Element {
     const {
         control,
         handleSubmit,
@@ -61,19 +62,22 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
                 if (res.status === 'success') {
                     setMessageToast(`${title} successful`);
+                    setTypeToast('success');
                     setOpenToast(true);
                     setOpen(false);
                 } else {
                     setMessageToast(`${title} failed`);
+                    setTypeToast('error');
                     setOpenToast(true);
                 }
             } catch (error) {
                 console.error(`Error ${title}:`, error);
                 setMessageToast(`${title} failed`);
+                setTypeToast('error');
                 setOpenToast(true);
             }
         },
-        [isEditMode, setMessageToast, setOpen, setOpenToast, title]
+        [isEditMode, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
     );
 
     React.useEffect(() => {
