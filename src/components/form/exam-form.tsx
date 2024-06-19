@@ -18,7 +18,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
-import { Severity } from '../toast/toast';
+import { type Severity } from '../toast/toast';
 
 const style = {
     position: 'absolute',
@@ -32,7 +32,7 @@ const style = {
     p: 4,
 };
 
-const status = [
+const examStatus = [
     { value: 'open', label: 'Open' },
     { value: 'closed', label: 'Closed' },
 ] as const;
@@ -41,10 +41,10 @@ const schema = zod.object({
     id: zod.string().min(1, { message: 'ID is required' }),
     name: zod.string().min(1, { message: 'Name is required' }),
     questions: zod.string().min(1, { message: 'Questions is required' }),
-    duration: zod.number().min(1, { message: 'Duration is required' }),
+    duration: zod.string().min(1, { message: 'Duration is required' }),
     status: zod.string().min(1, { message: 'Status is required' }),
-    startDate: zod.date().min(dayjs().toDate(), { message: 'Start date is required' }),
-    endDate: zod.date().min(dayjs().toDate(), { message: 'End date is required' }),
+    startDate: zod.any(),
+    endDate: zod.any(),
 });
 
 type Values = zod.infer<typeof schema>;
@@ -62,11 +62,12 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
 
     const onSubmit = React.useCallback(
         async (values: Values): Promise<void> => {
-            console.log(values);
-            const { id, name, questions, duration, startDate, endDate } = values;
+            console.log({ values});
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
+            const { id, name, questions, duration, status, startDate, endDate } = values;
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- disable warning
-                const res = isEditMode ? await updateExam(id, name, questions, duration, startDate.toISOString(), endDate.toISOString()) : await createExam(id, name, questions, duration, startDate.toISOString(), endDate.toISOString());
+                const res = isEditMode ? await updateExam(id, name, questions, Number(duration), status, startDate.toISOString(), endDate.toISOString()) : await createExam(id, name, questions, Number(duration), status, startDate.toISOString(), endDate.toISOString());
                 console.log(res);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
                 if (res.status === 'success') {
@@ -86,8 +87,11 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                 setOpenToast(true);
             }
         },
-        [isEditMode, setMessageToast, setOpen, setOpenToast, title]
+        [isEditMode, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
+
     );
+
+    const onInvalid = (errors) => console.error(errors)
 
     React.useEffect(() => {
         if (data) {
@@ -97,8 +101,8 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                 questions: data.questions.join(', '),
                 duration: data.duration,
                 status: data.status,
-                startDate: new Date(data.startDate),
-                endDate: new Date(data.endDate),
+                startDate: dayjs(data.startDate),
+                endDate: dayjs(data.endDate),
             });
         }
     }, [data, reset]);
@@ -124,7 +128,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                             {title}
                         </Typography>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="">
+                        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="">
                             <Stack spacing={2}>
                                 <Controller
                                     control={control}
@@ -166,19 +170,19 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                     render={({ field }) => (
                                         <FormControl>
                                             <InputLabel>Duration</InputLabel>
-                                            <OutlinedInput {...field} label="Duration" type="text" />
+                                            <OutlinedInput {...field} label="Duration" type="number" />
                                         </FormControl>
                                     )}
                                 />
                                 <Controller
                                     control={control}
                                     name="status"
-                                    defaultValue={data?.status}
+                                    defaultValue={data?.status ?? ''}
                                     render={({ field }) => (
                                         <FormControl>
                                             <InputLabel>Status</InputLabel>
                                             <Select label="Status" variant="outlined" {...field} >
-                                                {status.map((option) => (
+                                                {examStatus.map((option) => (
                                                     <MenuItem key={option.value} value={option.value}>
                                                         {option.label}
                                                     </MenuItem>
@@ -190,7 +194,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                 <Controller
                                     control={control}
                                     name="startDate"
-                                    defaultValue={data?.startDate ? new Date(data.startDate) : undefined}
+                                    defaultValue={data?.startDate ? dayjs(data?.startDate) : null}
                                     render={({ field }) => (
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                                             <DateTimePicker
@@ -203,7 +207,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                 <Controller
                                     control={control}
                                     name="endDate"
-                                    defaultValue={data?.endDate ? new Date(data.endDate) : undefined}
+                                    defaultValue={data?.endDate ? dayjs(data?.endDate) : null}
                                     render={({ field }) => (
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                                             <DateTimePicker

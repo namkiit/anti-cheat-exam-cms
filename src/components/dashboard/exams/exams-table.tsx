@@ -27,7 +27,7 @@ export interface Exam {
   _id: string;
   name: string;
   questions: string[];
-  duration: number;
+  duration: string;
   status: string;
   startDate: string;
   endDate: string;
@@ -55,7 +55,7 @@ export function ExamsTable(): React.JSX.Element {
     name: '',
     questions: [],
     duration: 0,
-    status: '',
+    status: 0,
     startDate: '',
     endDate: '',
     createdAt: new Date(),

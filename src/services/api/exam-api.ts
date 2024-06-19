@@ -28,7 +28,7 @@ const getAllExams = async (): Promise<Exam[]> => {
   }
 };
 
-const createExam = async (id: string, name: string, questions: string, duration: number, startDate: string, endDate: string) => {
+const createExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string) => {
   try {
     const res = await axiosInstance.post(`/exam/create`, {
       // headers: {
@@ -38,6 +38,7 @@ const createExam = async (id: string, name: string, questions: string, duration:
       name,
       questions: questions?.split(',').map(questionId => questionId.trim()),
       duration,
+      status,
       startDate,
       endDate
     });
@@ -54,7 +55,7 @@ const createExam = async (id: string, name: string, questions: string, duration:
   }
 };
 
-const updateExam = async (id: string, name: string, questions: string, duration: number, startDate: string, endDate: string) => {
+const updateExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string) => {
   try {
     const res = await axiosInstance.post(`/exam/update`, {
       // headers: {
@@ -64,6 +65,7 @@ const updateExam = async (id: string, name: string, questions: string, duration:
       name,
       questions: questions?.split(',').map(questionId => questionId.trim()),
       duration,
+      status,
       startDate,
       endDate
     });

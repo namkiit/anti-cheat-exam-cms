@@ -14,7 +14,7 @@ import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Question } from '../dashboard/questions/questions-table';
 import { createQuestion, updateQuestion } from '@/services/api/question-api';
-import { Severity } from '../toast/toast';
+import { type Severity } from '../toast/toast';
 // import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 // import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 
