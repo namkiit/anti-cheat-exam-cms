@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import { useSelection } from '@/hooks/use-selection';
 import { TopControl } from '@/components/top-control/top-control';
 import { QuestionsFilters } from "./questions-filters";
-import { deleteQuestion, getAllQuestions } from '@/services/api/question-api';
+import { deleteQuestion, findQuestion, getAllQuestions } from '@/services/api/question-api';
 import Button from '@mui/material/Button';
 import { type Severity, Toast } from '@/components/toast/toast';
 import { QuestionForm } from '@/components/form/question-form';
@@ -42,6 +42,7 @@ export function QuestionsTable(): React.JSX.Element {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const [allQuestions, setAllQuestions] = React.useState<Question[]>([]);
+  const [rows, setRows] = React.useState<Question[]>([]);
   const [open, setOpen] = React.useState(false);
   const [openToast, setOpenToast] = React.useState<boolean>(false);
   const [messageToast, setMessageToast] = React.useState<string>('');
@@ -55,11 +56,11 @@ export function QuestionsTable(): React.JSX.Element {
     createdAt: new Date(),
   });
 
-  const rowIds = React.useMemo(() => allQuestions.map((row) => row._id), [allQuestions]);
+  const rowIds = React.useMemo(() => rows.map((row) => row._id), [rows]);
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
 
-  const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < allQuestions.length;
-  const selectedAll = allQuestions.length > 0 && selected?.size === allQuestions.length;
+  const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
+  const selectedAll = rows.length > 0 && selected?.size === rows.length;
 
   React.useEffect(() => {
     const fetchQuestions = async (): Promise<void> => {
@@ -73,6 +74,11 @@ export function QuestionsTable(): React.JSX.Element {
 
     void fetchQuestions();
   }, [messageToast]);
+
+  React.useEffect(() => {
+    const paginatedQuestions = applyPagination(allQuestions, page, rowsPerPage);
+    setRows(paginatedQuestions);
+  }, [allQuestions, page, rowsPerPage]);
 
   const handleDeleteQuestion = async (id: string): Promise<void> => {
     try {
@@ -90,6 +96,29 @@ export function QuestionsTable(): React.JSX.Element {
     }
   };
 
+  const handleSearch = async (searchText: string): Promise<void> => {
+    if (searchText) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
+        const filteredQuestions = await findQuestion(searchText);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- temporary
+        setAllQuestions(filteredQuestions.data);
+      } catch (error) {
+        console.error('Error searching questions:', error);
+        setMessageToast('Failed to search questions');
+        setTypeToast('error');
+        setOpenToast(true);
+      }
+    } else {
+      try {
+        const questions: Question[] = await getAllQuestions();
+        setAllQuestions(questions);
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+      }
+    };
+  };
+
   const handleChangePage = (event: unknown, newPage: number): void => {
     setPage(newPage);
   };
@@ -99,12 +128,10 @@ export function QuestionsTable(): React.JSX.Element {
     setPage(0);
   };
 
-  const paginatedRows = applyPagination(allQuestions, page, rowsPerPage);
-
   return (
     <Stack spacing={3}>
       <TopControl title="Questions" setOpenToast={setOpenToast} setMessageToast={setMessageToast} setTypeToast={setTypeToast}/>
-      <QuestionsFilters />
+      <QuestionsFilters onSearch={handleSearch}/>
       <Card>
         <Box sx={{ overflowX: 'auto' }}>
           <Table sx={{ minWidth: '800px' }}>
@@ -131,7 +158,7 @@ export function QuestionsTable(): React.JSX.Element {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedRows.map((row) => {
+              {rows.map((row) => {
                 const isSelected = selected?.has(row._id);
 
                 return (

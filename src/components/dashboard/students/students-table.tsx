@@ -23,7 +23,7 @@ import { StudentForm } from '@/components/form/student-form';
 import { StudentsFilters } from '@/components/dashboard/students/students-filters';
 import { TopControl } from '@/components/top-control/top-control';
 import { type Severity, Toast } from '@/components/toast/toast';
-import { deleteStudent, getAllStudents } from '@/services/api/student-api';
+import { deleteStudent, findStudent, getAllStudents } from '@/services/api/student-api';
 
 export interface Student {
   _id: string;
@@ -94,6 +94,29 @@ export function StudentsTable(): React.JSX.Element {
     }
   };
 
+  const handleSearch = async (searchText: string): Promise<void> => {
+    if (searchText) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
+        const filteredStudents = await findStudent(searchText);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- temporary
+        setAllStudents(filteredStudents.data);
+      } catch (error) {
+        console.error('Error searching students:', error);
+        setMessageToast('Failed to search students');
+        setTypeToast('error');
+        setOpenToast(true);
+      }
+    } else {
+      try {
+        const students: Student[] = await getAllStudents();
+        setAllStudents(students);
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      }
+    };
+  };
+
   const handleChangePage = (event: unknown, newPage: number): void => {
     setPage(newPage);
   };
@@ -105,8 +128,8 @@ export function StudentsTable(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
-      <TopControl title="Students" setOpenToast={setOpenToast} setMessageToast={setMessageToast} setTypeToast={setTypeToast}/>
-      <StudentsFilters />
+      <TopControl title="Students" setOpenToast={setOpenToast} setMessageToast={setMessageToast} setTypeToast={setTypeToast} />
+      <StudentsFilters onSearch={handleSearch} />
       <Card>
         <Box sx={{ overflowX: 'auto' }}>
           <Table sx={{ minWidth: '800px' }}>
@@ -138,7 +161,7 @@ export function StudentsTable(): React.JSX.Element {
             <TableBody>
               {rows.map((row) => {
                 const isSelected = selected?.has(row._id);
-  
+
                 return (
                   <TableRow hover key={row._id} selected={isSelected}>
                     <TableCell padding="checkbox">

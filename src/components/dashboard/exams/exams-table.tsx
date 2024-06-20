@@ -20,7 +20,7 @@ import { useSelection } from '@/hooks/use-selection';
 import { ExamForm } from '@/components/form/exam-form';
 import { TopControl } from '@/components/top-control/top-control';
 import { ExamsFilters } from './exams-filters';
-import { deleteExam, getAllExams } from '@/services/api/exam-api';
+import { deleteExam, getAllExams, findExam } from '@/services/api/exam-api';
 import { type Severity, Toast } from '@/components/toast/toast';
 
 export interface Exam {
@@ -39,12 +39,14 @@ export interface AssignedExam {
 }
 
 export interface SubmittedExam extends AssignedExam {
-  answers: any[];
+  answers: string[];
 }
 
 export function ExamsTable(): React.JSX.Element {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const [allExams, setAllExams] = React.useState<Exam[]>([]);
   const [rows, setRows] = React.useState<Exam[]>([]);
   const [open, setOpen] = React.useState(false);
   const [openToast, setOpenToast] = React.useState<boolean>(false);
@@ -54,8 +56,8 @@ export function ExamsTable(): React.JSX.Element {
     _id: '',
     name: '',
     questions: [],
-    duration: 0,
-    status: 0,
+    duration: '',
+    status: '',
     startDate: '',
     endDate: '',
     createdAt: new Date(),
@@ -71,7 +73,7 @@ export function ExamsTable(): React.JSX.Element {
     const fetchExams = async (): Promise<void> => {
       try {
         const exams: Exam[] = await getAllExams();
-        setRows(exams);
+        setAllExams(exams);
       } catch (error) {
         console.error('Error fetching exams:', error);
       }
@@ -80,11 +82,15 @@ export function ExamsTable(): React.JSX.Element {
     void fetchExams();
   }, [messageToast]);
 
+  React.useEffect(() => {
+    const paginatedExams = applyPagination(allExams, page, rowsPerPage);
+    setRows(paginatedExams);
+  }, [allExams, page, rowsPerPage]);
+
   const handleDeleteExam = async (id: string): Promise<void> => {
     try {
       await deleteExam(id);
-      const updatedRows = rows.filter((row) => row._id !== id);
-      setRows(updatedRows);
+      setAllExams(allExams.filter((exam) => exam._id !== id));
       setMessageToast('Delete exam successfully');
       setTypeToast('success');
       setOpenToast(true);
@@ -96,6 +102,29 @@ export function ExamsTable(): React.JSX.Element {
     }
   };
 
+  const handleSearch = async (searchText: string): Promise<void> => {
+    if (searchText) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
+        const filteredExams = await findExam(searchText);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- temporary
+        setAllExams(filteredExams.data);
+      } catch (error) {
+        console.error('Error searching exams:', error);
+        setMessageToast('Failed to search exams');
+        setTypeToast('error');
+        setOpenToast(true);
+      }
+    } else {
+      try {
+        const exams: Exam[] = await getAllExams();
+        setAllExams(exams);
+      } catch (error) {
+        console.error('Error fetching exams:', error);
+      }
+    };
+  };
+
   const handleChangePage = (event: unknown, newPage: number): void => {
     setPage(newPage);
   };
@@ -105,12 +134,10 @@ export function ExamsTable(): React.JSX.Element {
     setPage(0);
   };
 
-  const paginatedRows = applyPagination(rows, page, rowsPerPage);
-
   return (
     <Stack spacing={3}>
       <TopControl title="Exams" setOpenToast={setOpenToast} setMessageToast={setMessageToast} setTypeToast={setTypeToast} />
-      <ExamsFilters />
+      <ExamsFilters onSearch={handleSearch} />
       <Card>
         <Box sx={{ overflowX: 'auto' }}>
           <Table sx={{ minWidth: '800px' }}>
@@ -142,7 +169,7 @@ export function ExamsTable(): React.JSX.Element {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedRows.map((row) => {
+              {rows.map((row) => {
                 const isSelected = selected?.has(row._id);
 
                 return (
@@ -172,7 +199,7 @@ export function ExamsTable(): React.JSX.Element {
                     <TableCell>{dayjs(row.endDate).format('MMM D, YYYY')}</TableCell>
                     <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
                     <TableCell>
-                      <Button variant="contained" onClick={() => { 
+                      <Button variant="contained" onClick={() => {
                         setOpen(true);
                         setExamToEdit(row);
                       }}>Edit</Button>
@@ -189,7 +216,7 @@ export function ExamsTable(): React.JSX.Element {
         <Divider />
         <TablePagination
           component="div"
-          count={rows.length}
+          count={allExams.length}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           page={page}

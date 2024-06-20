@@ -102,4 +102,24 @@ const deleteExam = async (id: string) => {
   }
 };
 
-export { getAllExams, createExam, updateExam, deleteExam };
+const findExam = async (param: string) => {
+  try {
+    const res = await axiosInstance.get(`/findExam/${param}`, {
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      // },
+    });
+
+    const data: any = res.data;
+
+    // if (res.status >= 200 && res.status < 300 || data.err) {
+    //   throw new Error(data.err || "Failed to get exam from server!");
+    // }
+
+    return data;
+  } catch (e) {
+    throw e;
+  }
+}
+
+export { getAllExams, createExam, updateExam, deleteExam, findExam };

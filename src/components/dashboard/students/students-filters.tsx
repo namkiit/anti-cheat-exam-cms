@@ -4,10 +4,23 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 
-export function StudentsFilters(): React.JSX.Element {
+interface StudentsFiltersProps {
+  onSearch: (searchText: string) => void;
+}
+
+export function StudentsFilters({ onSearch }: StudentsFiltersProps): React.JSX.Element {
+  const [searchText, setSearchText] = React.useState<string>('');
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+    onSearch(event.target.value); // Call onSearch function with current search text
+  };
+
   return (
     <Card sx={{ p: 2 }}>
       <OutlinedInput
+        value={searchText}
+        onChange={handleSearchChange}
         defaultValue=""
         fullWidth
         placeholder="Search student"
