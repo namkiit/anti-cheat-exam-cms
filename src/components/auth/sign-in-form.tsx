@@ -19,8 +19,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 
 import { paths } from '@/paths';
-import { authClient } from '@/lib/auth/client';
-import { useUser } from '@/hooks/use-user';
+import { signIn } from 'next-auth/react';
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -34,7 +33,7 @@ const defaultValues = { email: 'namkiet3010@gmail.com', password: 'namkiet3010' 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
 
-  const { checkSession } = useUser();
+  // const { checkSession } = useUser();
 
   const [showPassword, setShowPassword] = React.useState<boolean>();
 
@@ -43,7 +42,7 @@ export function SignInForm(): React.JSX.Element {
   const {
     control,
     handleSubmit,
-    setError,
+    // setError,
     formState: { errors },
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
 
@@ -52,22 +51,44 @@ export function SignInForm(): React.JSX.Element {
       console.log(values)
       setIsPending(true);
 
-      const { error } = await authClient.signInWithPassword(values);
+      const { email, password } = values
 
-      if (error) {
-        setError('root', { type: 'server', message: error });
-        setIsPending(false);
-        return;
+      try {
+        const result = await signIn("credentials", {
+          redirect: false,
+          email,
+          password,
+        });
+  
+        console.log(result)
+        
+        if (result?.error) {
+          throw new Error(result.error);
+        }
+  
+        if (result?.ok) {
+          router.replace("/dashboard/exams");
+        }
+      } catch (e) {  
+        console.log(e);
       }
+      
+      // const { error } = await authClient.signInWithPassword(values);
 
-      // Refresh the auth state
-      await checkSession?.();
+      // if (error) {
+      //   setError('root', { type: 'server', message: error });
+      //   setIsPending(false);
+      //   return;
+      // }
 
-      // UserProvider, for this case, will not refresh the router
-      // After refresh, GuestGuard will handle the redirect
-      router.refresh();
+      // // Refresh the auth state
+      // await checkSession?.();
+
+      // // UserProvider, for this case, will not refresh the router
+      // // After refresh, GuestGuard will handle the redirect
+      // router.refresh();
     },
-    [checkSession, router, setError]
+    [router]
   );
 
   return (

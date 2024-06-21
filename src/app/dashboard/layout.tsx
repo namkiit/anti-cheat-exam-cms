@@ -1,19 +1,27 @@
+// app/dashboard/layout.tsx
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import GlobalStyles from '@mui/material/GlobalStyles';
-
-import { AuthGuard } from '@/components/auth/auth-guard';
+import { getServerSession } from 'next-auth/next';
+import { redirect } from 'next/navigation';
 import { MainNav } from '@/components/dashboard/layout/main-nav';
 import { SideNav } from '@/components/dashboard/layout/side-nav';
+import { authOptions } from '../api/auth/[...nextauth]/auth-options';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-export default function Layout({ children }: LayoutProps): React.JSX.Element {
+export default async function Layout({ children }: LayoutProps): Promise<React.JSX.Element> {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect('/auth/sign-in');
+  }
+
   return (
-    <AuthGuard>
+    <>
       <GlobalStyles
         styles={{
           body: {
@@ -45,6 +53,6 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           </main>
         </Box>
       </Box>
-    </AuthGuard>
+    </>
   );
 }

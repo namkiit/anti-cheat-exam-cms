@@ -7,9 +7,9 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useSession } from 'next-auth/react';
 
 const user = {
-  name: 'Kiet Nguyen',
   avatar: '/assets/avatar-10.png',
   jobTitle: 'Front-end Developer',
   country: 'Viet Nam',
@@ -18,6 +18,8 @@ const user = {
 } as const;
 
 export function AccountInfo(): React.JSX.Element {
+  const session = useSession();
+
   return (
     <Card>
       <CardContent>
@@ -26,7 +28,7 @@ export function AccountInfo(): React.JSX.Element {
             <Avatar src={user.avatar} sx={{ height: '80px', width: '80px' }} />
           </div>
           <Stack spacing={1} sx={{ textAlign: 'center' }}>
-            <Typography variant="h5">{user.name}</Typography>
+            <Typography variant="h5">{session.data?.user?.name}</Typography>
             <Typography color="text.secondary" variant="body2">
               {user.city} {user.country}
             </Typography>
