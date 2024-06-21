@@ -4,7 +4,6 @@ import type { Session } from 'next-auth';
 
 import '@/styles/global.css';
 
-import { UserProvider } from '@/contexts/user-context';
 import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
 import { UserSessionProvider } from '@/components/providers/session-provider';
@@ -24,9 +23,7 @@ export default function Layout({ children, pageProps }: LayoutProps): React.JSX.
       <body>
         <UserSessionProvider session={pageProps?.session}>
         <LocalizationProvider>
-          <UserProvider>
             <ThemeProvider>{children}</ThemeProvider>
-          </UserProvider>
         </LocalizationProvider>
         </UserSessionProvider>
       </body>
