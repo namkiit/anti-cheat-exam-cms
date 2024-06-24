@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- disable error type warning */
+/* eslint-disable @typescript-eslint/restrict-template-expressions -- disable warning */
+/* eslint-disable @typescript-eslint/no-unsafe-call -- disable warning */
+/* eslint-disable @typescript-eslint/no-unsafe-argument -- disable warning */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- disable warning */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- disable warning */
 'use client'
 
 import * as React from 'react';
@@ -19,6 +25,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { type Severity } from '../toast/toast';
+import { useSession } from 'next-auth/react';
+import { type Admin } from '@/models/admin-models';
 
 const style = {
     position: 'absolute',
@@ -50,7 +58,6 @@ const schema = zod.object({
 type Values = zod.infer<typeof schema>;
 
 export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageToast, setTypeToast }: { open: boolean, title: string, data?: Exam, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void, setTypeToast: (type: Severity) => void }): React.JSX.Element {
-    console.log({data})
     const {
         control,
         handleSubmit,
@@ -58,18 +65,17 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
         // setError,
         // formState: { errors },
     } = useForm<Values>({ resolver: zodResolver(schema) });
+
     const isEditMode = Boolean(data);
+    const session = useSession();
 
     const onSubmit = React.useCallback(
         async (values: Values): Promise<void> => {
-            console.log({ values});
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
             const { id, name, questions, duration, status, startDate, endDate } = values;
+            const accessToken = (session.data?.user as Admin).token;
             try {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- disable warning
-                const res = isEditMode ? await updateExam(id, name, questions, Number(duration), status, startDate.toISOString(), endDate.toISOString()) : await createExam(id, name, questions, Number(duration), status, startDate.toISOString(), endDate.toISOString());
-                console.log(res);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
+                const res = isEditMode ? await updateExam(id, name, questions, Number(duration), status, startDate.toISOString(), endDate.toISOString(), accessToken) : await createExam(id, name, questions, Number(duration), status, startDate.toISOString(), endDate.toISOString(), accessToken);
+                
                 if (res.status === 'success') {
                     setMessageToast(`${title} successful`);
                     setTypeToast('success');
@@ -80,18 +86,15 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                     setTypeToast('error');
                     setOpenToast(true);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error(`Error ${title}:`, error);
-                setMessageToast(`${title} failed`);
+                setMessageToast(`${title} failed - ${error?.response?.data?.message}`);
                 setTypeToast('error');
                 setOpenToast(true);
             }
         },
-        [isEditMode, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
-
+        [isEditMode, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
     );
-
-    const onInvalid = (errors) => console.error(errors)
 
     React.useEffect(() => {
         if (data) {
@@ -128,7 +131,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                             {title}
                         </Typography>
 
-                        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="">
+                        <form onSubmit={handleSubmit(onSubmit)} className="">
                             <Stack spacing={2}>
                                 <Controller
                                     control={control}

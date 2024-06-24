@@ -15,8 +15,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { type Question } from '../dashboard/questions/questions-table';
 import { createQuestion, updateQuestion } from '@/services/api/question-api';
 import { type Severity } from '../toast/toast';
-// import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
-// import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
+import { useSession } from 'next-auth/react';
+import { type Admin } from '@/models/admin-models';
 
 const style = {
     position: 'absolute',
@@ -55,11 +55,12 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
         reset,
         formState: { errors },
     } = useForm<Values>({ resolver: zodResolver(schema) });
+
     const isEditMode = Boolean(data);
+    const session = useSession();
 
     const onSubmit = React.useCallback(
         async (values: Values): Promise<void> => {
-            console.log(values);
             const { id, title, type, answerA, answerB, answerC, answerD, correctAnswer } = values;
             const answerVariables = { answerA, answerB, answerC, answerD };
             type AnswerKeys = keyof typeof answerVariables;
@@ -67,10 +68,11 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                 const label = String.fromCharCode(97 + index); // Convert index to a corresponding letter (97 is 'a' in ASCII)
                 return { label, text: answerVariables[key as AnswerKeys] };
             });
+            const accessToken = (session.data?.user as Admin).token;
 
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- disable warning
-                const res = isEditMode ? await updateQuestion(id, title, type, answers, correctAnswer) : await createQuestion(id, title, type, answers, correctAnswer);
+                const res = isEditMode ? await updateQuestion(id, title, type, answers, correctAnswer, accessToken) : await createQuestion(id, title, type, answers, correctAnswer, accessToken);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
                 if (res.status === 'success') {
                     setMessageToast(`${titleForm} successful`);
@@ -89,7 +91,7 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                 setOpenToast(true);
             }
         },
-        [isEditMode, setMessageToast, setOpen, setOpenToast, titleForm]
+        [isEditMode, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, titleForm]
     );
 
     React.useEffect(() => {

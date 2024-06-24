@@ -14,9 +14,9 @@ import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Student } from '../dashboard/students/students-table';
 import { createStudent, updateStudent } from '@/services/api/student-api';
-import { Severity } from '../toast/toast';
-// import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
-// import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
+import { type Severity } from '../toast/toast';
+import { useSession } from 'next-auth/react';
+import { type Admin } from '@/models/admin-models';
 
 const style = {
     position: 'absolute',
@@ -50,14 +50,16 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
     } = useForm<Values>({ resolver: zodResolver(schema) });
 
     const isEditMode = Boolean(data);
+    const session = useSession();
 
     const onSubmit = React.useCallback(
         async (values: Values): Promise<void> => {
-            console.log(values);
             const { id, fname, lname, password, assignedExams } = values;
+            const accessToken = (session.data?.user as Admin).token;
+
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- disable warning
-                const res = isEditMode ? await updateStudent(id, fname, lname, password, assignedExams) : await createStudent(id, fname, lname, password, assignedExams);
+                const res = isEditMode ? await updateStudent(id, fname, lname, password, assignedExams, accessToken) : await createStudent(id, fname, lname, password, assignedExams, accessToken);
                 console.log(res);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
                 if (res.status === 'success') {
@@ -77,7 +79,7 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                 setOpenToast(true);
             }
         },
-        [isEditMode, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
+        [isEditMode, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
     );
 
     React.useEffect(() => {

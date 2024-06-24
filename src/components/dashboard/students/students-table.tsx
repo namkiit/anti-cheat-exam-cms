@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-// import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Checkbox from '@mui/material/Checkbox';
@@ -24,6 +23,8 @@ import { StudentsFilters } from '@/components/dashboard/students/students-filter
 import { TopControl } from '@/components/top-control/top-control';
 import { type Severity, Toast } from '@/components/toast/toast';
 import { deleteStudent, findStudent, getAllStudents } from '@/services/api/student-api';
+import { useSession } from 'next-auth/react';
+import { type Admin } from '@/models/admin-models';
 
 export interface Student {
   _id: string;
@@ -61,27 +62,32 @@ export function StudentsTable(): React.JSX.Element {
   const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
   const selectedAll = rows.length > 0 && selected?.size === rows.length;
 
+  const { data: session, status } = useSession();
+  const isLoadingSession = status === 'loading';
+
   React.useEffect(() => {
-    const fetchStudents = async (): Promise<void> => {
+    const fetchStudents = async (token: string | undefined): Promise<void> => {
       try {
-        const students: Student[] = await getAllStudents();
+        const students: Student[] = await getAllStudents(token);
         setAllStudents(students);
       } catch (error) {
         console.error('Error fetching students:', error);
       }
     };
 
-    void fetchStudents();
-  }, [messageToast]);
+    if (!isLoadingSession && session?.user) {
+      void fetchStudents((session.user as Admin)?.token);
+    }
+  }, [isLoadingSession, messageToast, session?.user]);
 
   React.useEffect(() => {
     const paginatedStudents = applyPagination(allStudents, page, rowsPerPage);
     setRows(paginatedStudents);
   }, [allStudents, page, rowsPerPage]);
 
-  const handleDeleteStudent = async (id: string): Promise<void> => {
+  const handleDeleteStudent = async (id: string, token: string | undefined): Promise<void> => {
     try {
-      await deleteStudent(id);
+      await deleteStudent(id, token);
       setMessageToast('Delete student successfully');
       setTypeToast('success');
       setOpenToast(true);
@@ -94,11 +100,11 @@ export function StudentsTable(): React.JSX.Element {
     }
   };
 
-  const handleSearch = async (searchText: string): Promise<void> => {
+  const handleSearch = async (searchText: string, token: string | undefined): Promise<void> => {
     if (searchText) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
-        const filteredStudents = await findStudent(searchText);
+        const filteredStudents = await findStudent(searchText, token);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- temporary
         setAllStudents(filteredStudents.data);
       } catch (error) {
@@ -109,7 +115,7 @@ export function StudentsTable(): React.JSX.Element {
       }
     } else {
       try {
-        const students: Student[] = await getAllStudents();
+        const students: Student[] = await getAllStudents(token);
         setAllStudents(students);
       } catch (error) {
         console.error('Error fetching students:', error);
@@ -194,7 +200,7 @@ export function StudentsTable(): React.JSX.Element {
                       }}>Edit</Button>
                     </TableCell>
                     <TableCell>
-                      <Button variant="outlined" color="error" onClick={() => { void handleDeleteStudent(row._id) }}>Delete</Button>
+                      <Button variant="outlined" color="error" onClick={() => { void handleDeleteStudent(row._id, (session?.user as Admin).token) }}>Delete</Button>
                     </TableCell>
                   </TableRow>
                 );

@@ -5,9 +5,9 @@ import { PlugsConnected as PlugsConnectedIcon } from '@phosphor-icons/react/dist
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
 import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 import { XSquare } from '@phosphor-icons/react/dist/ssr/XSquare';
-import { Student as StudentIcon } from '@phosphor-icons/react';
-import { Exam as ExamIcon } from '@phosphor-icons/react';
-import { Question as QuestionIcon } from '@phosphor-icons/react';
+import { Student as StudentIcon } from '@phosphor-icons/react/dist/ssr/Student';
+import { Exam as ExamIcon } from '@phosphor-icons/react/dist/ssr/Exam';
+import { Question as QuestionIcon } from '@phosphor-icons/react/dist/ssr/Question';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,

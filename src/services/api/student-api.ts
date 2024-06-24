@@ -9,19 +9,21 @@ import { type Student } from '@/components/dashboard/students/students-table';
 
 import axiosInstance from '../axiosInstance';
 
-const getAllStudents = async (): Promise<Student[]> => {
+const getAllStudents = async (token: string | undefined): Promise<Student[]> => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+  
   try {
     const res = await axiosInstance.get(`/students/`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -34,27 +36,35 @@ const createStudent = async (
   fname: string,
   lname: string,
   password: string,
-  assignedExams: string | undefined
+  assignedExams: string | undefined,
+  token: string | undefined
 ) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+
   try {
-    const res = await axiosInstance.post(`/student/create`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
-      _id: id,
-      fname,
-      lname,
-      password,
-      assignedExams: assignedExams?.split(',').map((examId) => ({
-        examId: examId.trim(),
-      })),
-    });
+    const res = await axiosInstance.post(
+      `/student/create`,
+      {
+        _id: id,
+        fname,
+        lname,
+        password,
+        assignedExams: assignedExams?.split(",").map((examId) => ({
+          examId: examId.trim()
+        }))
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
     
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -67,27 +77,35 @@ const updateStudent = async (
   fname: string,
   lname: string,
   password: string,
-  assignedExams: string | undefined
+  assignedExams: string | undefined,
+  token: string | undefined
 ) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+
   try {
-    const res = await axiosInstance.post(`/student/update`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
-      _id: id,
-      fname,
-      lname,
-      password,
-      assignedExams: assignedExams?.split(',').map((examId) => ({
-        examId: examId.trim(),
-      })),
-    });
+    const res = await axiosInstance.post(
+      `/student/update`,
+      {
+        _id: id,
+        fname,
+        lname,
+        password,
+        assignedExams: assignedExams?.split(",").map((examId) => ({
+          examId: examId.trim()
+        }))
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
     
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -96,19 +114,21 @@ const updateStudent = async (
 };
 
 
-const deleteStudent = async (id: string) => {
+const deleteStudent = async (id: string, token: string | undefined) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+
   try {
     const res = await axiosInstance.delete(`/student/${id}`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
     
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -116,19 +136,21 @@ const deleteStudent = async (id: string) => {
   }
 };
 
-const findStudent = async (param: string) => {
+const findStudent = async (param: string, token: string | undefined) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+
   try {
     const res = await axiosInstance.get(`/findStudent/${param}`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {

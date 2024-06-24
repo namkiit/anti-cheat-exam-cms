@@ -22,6 +22,8 @@ import { TopControl } from '@/components/top-control/top-control';
 import { ExamsFilters } from './exams-filters';
 import { deleteExam, getAllExams, findExam } from '@/services/api/exam-api';
 import { type Severity, Toast } from '@/components/toast/toast';
+import { useSession } from 'next-auth/react';
+import { type Admin } from '@/models/admin-models';
 
 export interface Exam {
   _id: string;
@@ -69,27 +71,32 @@ export function ExamsTable(): React.JSX.Element {
   const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
   const selectedAll = rows.length > 0 && selected?.size === rows.length;
 
+  const { data: session, status } = useSession();
+  const isLoadingSession = status === 'loading';
+
   React.useEffect(() => {
-    const fetchExams = async (): Promise<void> => {
+    const fetchExams = async (token: string | undefined): Promise<void> => {
       try {
-        const exams: Exam[] = await getAllExams();
+        const exams: Exam[] = await getAllExams(token);
         setAllExams(exams);
       } catch (error) {
         console.error('Error fetching exams:', error);
       }
     };
 
-    void fetchExams();
-  }, [messageToast]);
+    if (!isLoadingSession && session?.user) {
+      void fetchExams((session.user as Admin)?.token);
+    }
+  }, [isLoadingSession, messageToast, session?.user]);
 
   React.useEffect(() => {
     const paginatedExams = applyPagination(allExams, page, rowsPerPage);
     setRows(paginatedExams);
   }, [allExams, page, rowsPerPage]);
 
-  const handleDeleteExam = async (id: string): Promise<void> => {
+  const handleDeleteExam = async (id: string, token: string | undefined): Promise<void> => {
     try {
-      await deleteExam(id);
+      await deleteExam(id, token);
       setAllExams(allExams.filter((exam) => exam._id !== id));
       setMessageToast('Delete exam successfully');
       setTypeToast('success');
@@ -102,11 +109,11 @@ export function ExamsTable(): React.JSX.Element {
     }
   };
 
-  const handleSearch = async (searchText: string): Promise<void> => {
+  const handleSearch = async (searchText: string, token: string | undefined): Promise<void> => {
     if (searchText) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
-        const filteredExams = await findExam(searchText);
+        const filteredExams = await findExam(searchText, token);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- temporary
         setAllExams(filteredExams.data);
       } catch (error) {
@@ -117,7 +124,7 @@ export function ExamsTable(): React.JSX.Element {
       }
     } else {
       try {
-        const exams: Exam[] = await getAllExams();
+        const exams: Exam[] = await getAllExams(token);
         setAllExams(exams);
       } catch (error) {
         console.error('Error fetching exams:', error);
@@ -205,7 +212,7 @@ export function ExamsTable(): React.JSX.Element {
                       }}>Edit</Button>
                     </TableCell>
                     <TableCell>
-                      <Button variant="outlined" color="error" onClick={() => { void handleDeleteExam(row._id) }}>Delete</Button>
+                      <Button variant="outlined" color="error" onClick={() => { void handleDeleteExam(row._id, (session?.user as Admin).token) }}>Delete</Button>
                     </TableCell>
                   </TableRow>
                 );

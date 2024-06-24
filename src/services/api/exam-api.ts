@@ -8,19 +8,21 @@
 import { type Exam } from "@/components/dashboard/exams/exams-table";
 import axiosInstance from "../axiosInstance";
 
-const getAllExams = async (): Promise<Exam[]> => {
+const getAllExams = async (token: string | undefined): Promise<Exam[]> => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+
   try {
     const res = await axiosInstance.get(`/exams/`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -28,26 +30,33 @@ const getAllExams = async (): Promise<Exam[]> => {
   }
 };
 
-const createExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string) => {
+const createExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string, token: string | undefined) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+
   try {
-    const res = await axiosInstance.post(`/exam/create`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
-      _id: id,
-      name,
-      questions: questions?.split(',').map(questionId => questionId.trim()),
-      duration,
-      status,
-      startDate,
-      endDate
-    });
+    const res = await axiosInstance.post(
+      `/exam/create`,
+      {
+        _id: id,
+        name,
+        questions: questions?.split(",").map((questionId) => questionId.trim()),
+        duration,
+        status,
+        startDate,
+        endDate
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -55,26 +64,33 @@ const createExam = async (id: string, name: string, questions: string, duration:
   }
 };
 
-const updateExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string) => {
+const updateExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string, token: string | undefined) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+  
   try {
-    const res = await axiosInstance.post(`/exam/update`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
-      _id: id,
-      name,
-      questions: questions?.split(',').map(questionId => questionId.trim()),
-      duration,
-      status,
-      startDate,
-      endDate
-    });
+    const res = await axiosInstance.post(
+      `/exam/update`,
+      {
+        _id: id,
+        name,
+        questions: questions?.split(',').map((questionId) => questionId.trim()),
+        duration,
+        status,
+        startDate,
+        endDate
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -82,19 +98,21 @@ const updateExam = async (id: string, name: string, questions: string, duration:
   }
 };
 
-const deleteExam = async (id: string) => {
+const deleteExam = async (id: string, token: string | undefined) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+  
   try {
     const res = await axiosInstance.delete(`/exam/${id}`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {
@@ -102,19 +120,21 @@ const deleteExam = async (id: string) => {
   }
 };
 
-const findExam = async (param: string) => {
+const findExam = async (param: string, token: string | undefined) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+  
   try {
     const res = await axiosInstance.get(`/findExam/${param}`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`,
-      // },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data: any = res.data;
-
-    // if (res.status >= 200 && res.status < 300 || data.err) {
-    //   throw new Error(data.err || "Failed to get exam from server!");
-    // }
 
     return data;
   } catch (e) {

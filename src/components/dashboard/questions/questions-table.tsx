@@ -22,6 +22,8 @@ import { deleteQuestion, findQuestion, getAllQuestions } from '@/services/api/qu
 import Button from '@mui/material/Button';
 import { type Severity, Toast } from '@/components/toast/toast';
 import { QuestionForm } from '@/components/form/question-form';
+import { useSession } from 'next-auth/react';
+import { type Admin } from '@/models/admin-models';
 
 export interface Question {
   _id: string;
@@ -62,27 +64,32 @@ export function QuestionsTable(): React.JSX.Element {
   const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
   const selectedAll = rows.length > 0 && selected?.size === rows.length;
 
+  const { data: session, status } = useSession();
+  const isLoadingSession = status === 'loading';
+
   React.useEffect(() => {
-    const fetchQuestions = async (): Promise<void> => {
+    const fetchQuestions = async (token: string | undefined): Promise<void> => {
       try {
-        const questions: Question[] = await getAllQuestions();
+        const questions: Question[] = await getAllQuestions(token);
         setAllQuestions(questions);
       } catch (error) {
         console.error('Error fetching questions:', error);
       }
     };
 
-    void fetchQuestions();
-  }, [messageToast]);
+    if (!isLoadingSession && session?.user) {
+      void fetchQuestions((session.user as Admin)?.token);
+    }
+  }, [isLoadingSession, messageToast, session?.user]);
 
   React.useEffect(() => {
     const paginatedQuestions = applyPagination(allQuestions, page, rowsPerPage);
     setRows(paginatedQuestions);
   }, [allQuestions, page, rowsPerPage]);
 
-  const handleDeleteQuestion = async (id: string): Promise<void> => {
+  const handleDeleteQuestion = async (id: string, token: string | undefined): Promise<void> => {
     try {
-      await deleteQuestion(id);
+      await deleteQuestion(id, token);
       const updatedQuestions = allQuestions.filter((row) => row._id !== id);
       setAllQuestions(updatedQuestions);
       setMessageToast('Delete question successfully');
@@ -96,11 +103,11 @@ export function QuestionsTable(): React.JSX.Element {
     }
   };
 
-  const handleSearch = async (searchText: string): Promise<void> => {
+  const handleSearch = async (searchText: string, token: string | undefined): Promise<void> => {
     if (searchText) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- temporary
-        const filteredQuestions = await findQuestion(searchText);
+        const filteredQuestions = await findQuestion(searchText, token);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- temporary
         setAllQuestions(filteredQuestions.data);
       } catch (error) {
@@ -111,7 +118,7 @@ export function QuestionsTable(): React.JSX.Element {
       }
     } else {
       try {
-        const questions: Question[] = await getAllQuestions();
+        const questions: Question[] = await getAllQuestions(token);
         setAllQuestions(questions);
       } catch (error) {
         console.error('Error fetching questions:', error);
@@ -189,7 +196,7 @@ export function QuestionsTable(): React.JSX.Element {
                         }}>Edit</Button>
                       </TableCell>
                       <TableCell>
-                        <Button variant="outlined" color="error" onClick={() => { void handleDeleteQuestion(row._id) }}>Delete</Button>
+                        <Button variant="outlined" color="error" onClick={() => { void handleDeleteQuestion(row._id, (session?.user as Admin).token) }}>Delete</Button>
                       </TableCell>
                   </TableRow>
                 );
