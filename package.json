@@ -1,9 +1,8 @@
 {
-  "name": "material-kit-react",
-  "version": "4.0.0",
-  "author": "Devias",
-  "licence": "MIT",
-  "homepage": "https://devias.io",
+  "name": "anti-cheat-exam-cms",
+  "version": "1.0.0",
+  "author": "Kiet Nguyen",
+  "licence": "none",
   "private": false,
   "scripts": {
     "dev": "next dev",
