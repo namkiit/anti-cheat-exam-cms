@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { Controller, useForm } from 'react-hook-form';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
-import { Button, FormControl, FormHelperText, OutlinedInput } from '@mui/material';
+import { Button, Card, CardContent, Divider, FormControl, FormHelperText, List, ListItem, ListItemText, OutlinedInput } from '@mui/material';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Student } from '../dashboard/students/students-table';
@@ -42,6 +42,8 @@ const schema = zod.object({
 type Values = zod.infer<typeof schema>;
 
 export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessageToast, setTypeToast }: { open: boolean, title: string, data?: Student, setOpen: (open: boolean) => void, setOpenToast: (openToast: boolean) => void, setMessageToast: (message: string) => void, setTypeToast: (type: Severity) => void }): React.JSX.Element {
+    console.log(data)
+
     const {
         control,
         handleSubmit,
@@ -124,7 +126,7 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                                     render={({ field }) => (
                                         <FormControl error={Boolean(errors.id)}>
                                             <InputLabel>ID</InputLabel>
-                                            <OutlinedInput {...field} label="ID" type="text" disabled={isEditMode} /> 
+                                            <OutlinedInput {...field} label="ID" type="text" disabled={isEditMode} />
                                             {errors.id ? <FormHelperText>{errors.id.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
@@ -176,6 +178,51 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                                         </FormControl>
                                     )}
                                 />
+                                {data?.submittedExams && data?.submittedExams.length > 0 ? <Typography id="transition-modal-title" variant="h6" component="h6">
+                                        Student&apos;s submitted exams:
+                                    </Typography> : null}
+                                {data?.submittedExams.map((exam) => {
+                                    return (
+                                        <div key={exam.examId}>
+                                            <Card
+                                                sx={{
+                                                    boxShadow: "none",
+                                                    outline: "solid #eeeeee 2px",
+                                                }}
+                                            >
+                                                <CardContent>
+                                                    <Stack direction="row" justifyContent="center">
+                                                        <Typography
+                                                            sx={{ fontSize: 14, marginBottom: "12px" }}
+                                                            color="text.secondary"
+                                                            gutterBottom
+                                                        >
+                                                            ID: {exam?.examId}
+                                                        </Typography>
+                                                    </Stack>
+
+                                                    <Divider />
+
+                                                    <List>
+                                                        <ListItem>
+                                                            <ListItemText
+                                                                primary={`Điểm làm bài: ${exam.score.toString()}`}
+                                                                primaryTypographyProps={{ fontSize: 14, fontWeight: "medium" }}
+                                                            />
+                                                        </ListItem>
+
+                                                        <ListItem>
+                                                            <ListItemText
+                                                                primary={`Điểm uy tín: ${exam.credibilityScore.toString()} %`}
+                                                                primaryTypographyProps={{ fontSize: 14, fontWeight: "medium" }}
+                                                            />
+                                                        </ListItem>
+                                                    </List>
+                                                </CardContent>
+                                            </Card>
+                                        </div>
+                                    )
+                                })}
                                 <Button variant="contained" type="submit" sx={{ mt: 2 }}>
                                     {title}
                                 </Button>

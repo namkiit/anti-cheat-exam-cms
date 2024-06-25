@@ -41,7 +41,10 @@ export interface AssignedExam {
 }
 
 export interface SubmittedExam extends AssignedExam {
-  answers: string[];
+  examId: string;
+  score: number;
+  credibilityScore: number;
+  answers: object[];
 }
 
 export function ExamsTable(): React.JSX.Element {
