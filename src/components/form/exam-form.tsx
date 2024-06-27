@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import { Controller, useForm } from 'react-hook-form';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
-import { Button, FormControl, MenuItem, OutlinedInput, Select } from '@mui/material';
+import { Button, FormControl, FormHelperText, MenuItem, OutlinedInput, Select } from '@mui/material';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createExam, updateExam } from '@/services/api/exam-api';
@@ -48,7 +48,7 @@ const examStatus = [
 const schema = zod.object({
     id: zod.string().min(1, { message: 'ID is required' }),
     name: zod.string().min(1, { message: 'Name is required' }),
-    questions: zod.string().min(1, { message: 'Questions is required' }),
+    questions: zod.string().optional(),
     duration: zod.string().min(1, { message: 'Duration is required' }),
     status: zod.string().min(1, { message: 'Status is required' }),
     startDate: zod.any(),
@@ -62,8 +62,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
         control,
         handleSubmit,
         reset,
-        // setError,
-        // formState: { errors },
+        formState: { errors },
     } = useForm<Values>({ resolver: zodResolver(schema) });
 
     const isEditMode = Boolean(data);
@@ -141,6 +140,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                         <FormControl>
                                             <InputLabel>ID</InputLabel>
                                             <OutlinedInput {...field} label="ID" type="text" disabled={isEditMode} />
+                                            {errors.id ? <FormHelperText>{errors.id.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
@@ -152,6 +152,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                         <FormControl>
                                             <InputLabel>Name</InputLabel>
                                             <OutlinedInput {...field} label="Name" type="text" />
+                                            {errors.name ? <FormHelperText>{errors.name.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
@@ -174,6 +175,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                         <FormControl>
                                             <InputLabel>Duration (seconds)</InputLabel>
                                             <OutlinedInput {...field} label="Duration (seconds)" type="number" />
+                                            {errors.duration ? <FormHelperText>{errors.duration.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />
@@ -191,6 +193,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                                     </MenuItem>
                                                 ))}
                                             </Select>
+                                            {errors.status ? <FormHelperText>{errors.status.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
                                 />

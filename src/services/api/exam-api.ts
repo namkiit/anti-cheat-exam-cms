@@ -30,7 +30,7 @@ const getAllExams = async (token: string | undefined): Promise<Exam[]> => {
   }
 };
 
-const createExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string, token: string | undefined) => {
+const createExam = async (id: string, name: string, questions: string | undefined, duration: number, status: string, startDate: string, endDate: string, token: string | undefined) => {
   if (!token) {
     throw new Error('Token is required');
   }
@@ -41,7 +41,7 @@ const createExam = async (id: string, name: string, questions: string, duration:
       {
         _id: id,
         name,
-        questions: questions?.split(",").map((questionId) => questionId.trim()),
+        questions: questions ? questions?.split(',').map((questionId) => questionId.trim()) : [],
         duration,
         status,
         startDate,
@@ -64,7 +64,7 @@ const createExam = async (id: string, name: string, questions: string, duration:
   }
 };
 
-const updateExam = async (id: string, name: string, questions: string, duration: number, status: string, startDate: string, endDate: string, token: string | undefined) => {
+const updateExam = async (id: string, name: string, questions: string | undefined, duration: number, status: string, startDate: string, endDate: string, token: string | undefined) => {
   if (!token) {
     throw new Error('Token is required');
   }
@@ -75,7 +75,7 @@ const updateExam = async (id: string, name: string, questions: string, duration:
       {
         _id: id,
         name,
-        questions: questions?.split(',').map((questionId) => questionId.trim()),
+        questions: questions ? questions?.split(',').map((questionId) => questionId.trim()) : [],
         duration,
         status,
         startDate,

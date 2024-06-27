@@ -61,10 +61,6 @@ export function SignInForm(): React.JSX.Element {
           router.replace('/dashboard/exams');
         }
       } catch (e) {
-        if (e instanceof Error) {
-          setError('email', { type: 'manual', message: 'Invalid email or password' });
-          setError('password', { type: 'manual', message: 'Invalid email or password' });
-        }
         console.error(e);
       } finally {
         setIsPending(false);
