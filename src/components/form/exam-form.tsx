@@ -173,7 +173,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                     render={({ field }) => (
                                         <FormControl>
                                             <InputLabel>Duration (seconds)</InputLabel>
-                                            <OutlinedInput {...field} label="Duration" type="number" />
+                                            <OutlinedInput {...field} label="Duration (seconds)" type="number" />
                                         </FormControl>
                                     )}
                                 />
