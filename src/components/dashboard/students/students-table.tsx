@@ -13,7 +13,6 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
 
 import { useSelection } from '@/hooks/use-selection';
@@ -33,7 +32,6 @@ export interface Student {
   password: string;
   assignedExams: AssignedExam[];
   submittedExams: SubmittedExam[];
-  createdAt: Date;
 }
 
 export function StudentsTable(): React.JSX.Element {
@@ -53,7 +51,6 @@ export function StudentsTable(): React.JSX.Element {
     password: '',
     assignedExams: [],
     submittedExams: [],
-    createdAt: new Date(),
   });
 
   const rowIds = React.useMemo(() => rows.map((row) => row._id), [rows]);
@@ -159,7 +156,6 @@ export function StudentsTable(): React.JSX.Element {
                 <TableCell>Password</TableCell>
                 <TableCell>Number of Assigned Exams</TableCell>
                 <TableCell>Number of Submitted Exams</TableCell>
-                <TableCell>Created At</TableCell>
                 <TableCell />
                 <TableCell />
               </TableRow>
@@ -192,7 +188,6 @@ export function StudentsTable(): React.JSX.Element {
                     <TableCell>{'*'.repeat(row.password.length)}</TableCell>
                     <TableCell>{row.assignedExams.length}</TableCell>
                     <TableCell>{row.submittedExams.length}</TableCell>
-                    <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
                     <TableCell>
                       <Button variant="contained" onClick={() => {
                         setOpen(true)

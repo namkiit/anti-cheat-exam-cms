@@ -140,7 +140,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                     render={({ field }) => (
                                         <FormControl>
                                             <InputLabel>ID</InputLabel>
-                                            <OutlinedInput {...field} label="ID" type="text" />
+                                            <OutlinedInput {...field} label="ID" type="text" disabled={isEditMode} />
                                         </FormControl>
                                     )}
                                 />
@@ -172,7 +172,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                     defaultValue={data?.duration}
                                     render={({ field }) => (
                                         <FormControl>
-                                            <InputLabel>Duration</InputLabel>
+                                            <InputLabel>Duration (seconds)</InputLabel>
                                             <OutlinedInput {...field} label="Duration" type="number" />
                                         </FormControl>
                                     )}

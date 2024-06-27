@@ -13,7 +13,6 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import dayjs from 'dayjs';
 
 import { useSelection } from '@/hooks/use-selection';
 import { TopControl } from '@/components/top-control/top-control';
@@ -31,7 +30,6 @@ export interface Question {
   type: string;
   answers: Answer[];
   correctAnswer: 'a' | 'b' | 'c' | 'd' | 'A' | 'B' | 'C' | 'D';
-  createdAt: Date;
 }
 
 export interface Answer {
@@ -55,7 +53,6 @@ export function QuestionsTable(): React.JSX.Element {
     type: '',
     answers: [],
     correctAnswer: 'a',
-    createdAt: new Date(),
   });
 
   const rowIds = React.useMemo(() => rows.map((row) => row._id), [rows]);
@@ -159,7 +156,6 @@ export function QuestionsTable(): React.JSX.Element {
                 </TableCell>
                 <TableCell>ID</TableCell>
                 <TableCell>Title</TableCell>
-                <TableCell>Created At</TableCell>
                 <TableCell />
                 <TableCell />
               </TableRow>
@@ -188,7 +184,6 @@ export function QuestionsTable(): React.JSX.Element {
                         <Typography variant="subtitle2">{row.title}</Typography>
                       </Stack>
                     </TableCell>
-                    <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
                     <TableCell>
                         <Button variant="contained" onClick={() => {
                           setOpen(true)

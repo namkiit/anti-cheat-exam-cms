@@ -33,7 +33,6 @@ export interface Exam {
   status: string;
   startDate: string;
   endDate: string;
-  createdAt: Date;
 }
 
 export interface AssignedExam {
@@ -65,7 +64,6 @@ export function ExamsTable(): React.JSX.Element {
     status: '',
     startDate: '',
     endDate: '',
-    createdAt: new Date(),
   });
 
   const rowIds = React.useMemo(() => rows.map((row) => row._id), [rows]);
@@ -173,7 +171,6 @@ export function ExamsTable(): React.JSX.Element {
                 <TableCell>Status</TableCell>
                 <TableCell>Start Date</TableCell>
                 <TableCell>End Date</TableCell>
-                <TableCell>Created At</TableCell>
                 <TableCell />
                 <TableCell />
               </TableRow>
@@ -203,11 +200,10 @@ export function ExamsTable(): React.JSX.Element {
                       </Stack>
                     </TableCell>
                     <TableCell>{row.questions.length}</TableCell>
-                    <TableCell>{row.duration}</TableCell>
+                    <TableCell>{Math.floor(Number(row.duration) / 60)} mins</TableCell>
                     <TableCell>{row.status}</TableCell>
-                    <TableCell>{dayjs(row.startDate).format('MMM D, YYYY')}</TableCell>
-                    <TableCell>{dayjs(row.endDate).format('MMM D, YYYY')}</TableCell>
-                    <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
+                    <TableCell>{dayjs(row.startDate).format('MMM D, YYYY h:mm A')}</TableCell>
+                    <TableCell>{dayjs(row.endDate).format('MMM D, YYYY h:mm A')}</TableCell>
                     <TableCell>
                       <Button variant="contained" onClick={() => {
                         setOpen(true);
