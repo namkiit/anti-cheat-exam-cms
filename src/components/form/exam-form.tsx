@@ -81,6 +81,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                     setTypeToast('success');
                     setOpenToast(true);
                     setOpen(false);
+                    reset({ id: '', name: '', questions: '', duration: '', status: '', startDate: '', endDate: '' }); // clear form input after successful
                 } else {
                     setMessageToast(`${title} failed`);
                     setTypeToast('error');
@@ -93,7 +94,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                 setOpenToast(true);
             }
         },
-        [isEditMode, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
+        [isEditMode, reset, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
     );
 
     React.useEffect(() => {

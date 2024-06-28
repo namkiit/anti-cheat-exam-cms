@@ -69,6 +69,7 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                     setTypeToast('success');
                     setOpenToast(true);
                     setOpen(false);
+                    reset({ id: '', fname: '', lname: '', password: '', assignedExams: '' }); // clear form input after successful
                 } else {
                     setMessageToast(`${title} failed`);
                     setTypeToast('error');
@@ -81,7 +82,7 @@ export function StudentForm({ open, title, data, setOpen, setOpenToast, setMessa
                 setOpenToast(true);
             }
         },
-        [isEditMode, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
+        [isEditMode, reset, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, title]
     );
 
     React.useEffect(() => {

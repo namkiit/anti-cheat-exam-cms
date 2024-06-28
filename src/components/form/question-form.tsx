@@ -72,13 +72,14 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
 
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- disable warning
-                const res = isEditMode ? await updateQuestion(id, title, type, answers, correctAnswer, accessToken) : await createQuestion(id, title, type, answers, correctAnswer, accessToken);
+                const res = isEditMode ? await updateQuestion(id, title, type, answers, correctAnswer.toLowerCase(), accessToken) : await createQuestion(id, title, type, answers, correctAnswer.toLowerCase(), accessToken);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- disable warning
                 if (res.status === 'success') {
                     setMessageToast(`${titleForm} successful`);
                     setTypeToast('success');
                     setOpenToast(true);
                     setOpen(false);
+                    reset({ id: '', title: '', type: '', answerA: '', answerB: '', answerC: '', answerD: '', correctAnswer: 'a' }); // clear form input after successful
                 } else {
                     setMessageToast(`${titleForm} failed`);
                     setTypeToast('error');
@@ -91,7 +92,7 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                 setOpenToast(true);
             }
         },
-        [isEditMode, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, titleForm]
+        [isEditMode, reset, session.data?.user, setMessageToast, setOpen, setOpenToast, setTypeToast, titleForm]
     );
 
     React.useEffect(() => {
