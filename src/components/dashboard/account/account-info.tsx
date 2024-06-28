@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import { useSession } from 'next-auth/react';
 
 const user = {
-  avatar: '/assets/avatar-10.png',
+  avatar: '/assets/avatar-male.png',
   jobTitle: 'Front-end Developer',
   country: 'Viet Nam',
   city: 'Hanoi',
