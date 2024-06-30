@@ -2,7 +2,7 @@
   "name": "anti-cheat-exam-cms",
   "version": "1.0.0",
   "author": "Kiet Nguyen",
-  "license": "none",
+  "license": "ISC",
   "private": false,
   "scripts": {
     "dev": "next dev",
