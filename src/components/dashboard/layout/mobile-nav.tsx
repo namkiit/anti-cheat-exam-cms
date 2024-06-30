@@ -58,7 +58,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
         <Box component={RouterLink} href={paths.home} sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <Logo color="light" src='/assets/logo.png' height={32} width={32} />
           <Typography color="var(--mui-palette-neutral-100)" variant="subtitle2">
-            Anti Cheat Exam App CMS
+            Auto-Proctoring Exam App CMS
           </Typography>
         </Box>
       </Stack>

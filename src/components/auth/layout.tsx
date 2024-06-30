@@ -21,7 +21,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
           <Box sx={{ display: 'flex', gap: '15px', alignItems: 'center', p: 3 }}>
             <Logo color="light" src='/assets/logo.png' height={40} width={40} />
             <Typography color="black" sx={{ fontSize: '1rem' }}>
-              Anti Cheat Exam CMS
+              Auto-Proctoring Exam CMS
             </Typography>
           </Box>
 

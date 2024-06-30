@@ -7,6 +7,6 @@ export interface Config {
 }
 
 export const config: Config = {
-  site: { name: 'Anti Cheat Exam App CMS', description: '', themeColor: '#090a0b', url: getSiteURL() },
+  site: { name: 'Auto-Proctoring Exam CMS', description: '', themeColor: '#090a0b', url: getSiteURL() },
   logLevel: (process.env.NEXT_PUBLIC_LOG_LEVEL as keyof typeof LogLevel) ?? LogLevel.ALL,
 };

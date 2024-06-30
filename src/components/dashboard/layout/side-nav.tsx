@@ -51,7 +51,7 @@ export function SideNav(): React.JSX.Element {
         <Box component={RouterLink} href={paths.home} sx={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center' }}>
           <Logo color="light" src='/assets/logo.png' height={40} width={40} />
           <Typography color="var(--mui-palette-neutral-100)" variant="subtitle2" sx={{ fontSize: '1rem'}}>
-            Anti Cheat Exam CMS
+            Auto-Proctoring Exam CMS
           </Typography>
         </Box>
       </Stack>
