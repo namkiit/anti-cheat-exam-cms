@@ -138,7 +138,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                     name="id"
                                     defaultValue={data?._id}
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.id)}>
                                             <InputLabel>ID</InputLabel>
                                             <OutlinedInput {...field} label="ID" type="text" disabled={isEditMode} />
                                             {errors.id ? <FormHelperText>{errors.id.message}</FormHelperText> : null}
@@ -150,7 +150,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                     name="name"
                                     defaultValue={data?.name}
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.name)}>
                                             <InputLabel>Name</InputLabel>
                                             <OutlinedInput {...field} label="Name" type="text" />
                                             {errors.name ? <FormHelperText>{errors.name.message}</FormHelperText> : null}
@@ -171,9 +171,9 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                 <Controller
                                     control={control}
                                     name="duration"
-                                    defaultValue={data?.duration}
+                                    defaultValue={data?.duration.toString()}
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.duration)}>
                                             <InputLabel>Duration (seconds)</InputLabel>
                                             <OutlinedInput {...field} label="Duration (seconds)" type="number" />
                                             {errors.duration ? <FormHelperText>{errors.duration.message}</FormHelperText> : null}
@@ -185,7 +185,7 @@ export function ExamForm({ open, title, data, setOpen, setOpenToast, setMessageT
                                     name="status"
                                     defaultValue={data?.status ?? ''}
                                     render={({ field }) => (
-                                        <FormControl>
+                                        <FormControl error={Boolean(errors.status)}>
                                             <InputLabel>Status</InputLabel>
                                             <Select label="Status" variant="outlined" {...field} >
                                                 {examStatus.map((option) => (
