@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { Controller, useForm } from 'react-hook-form';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
-import { Button, FormControl, FormHelperText, OutlinedInput } from '@mui/material';
+import { Button, FormControl, FormHelperText, MenuItem, OutlinedInput, Select } from '@mui/material';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Question } from '../dashboard/questions/questions-table';
@@ -34,6 +34,9 @@ type AnswerFieldNames = 'answerA' | 'answerB' | 'answerC' | 'answerD';
 
 const answerFieldNames: AnswerFieldNames[] = ['answerA', 'answerB', 'answerC', 'answerD'];
 
+const questionTypes = [
+    { value: 'multiple-choice', label: 'Multiple Choice' },
+] as const;
 
 const schema = zod.object({
     id: zod.string().min(1, { message: 'ID is required' }),
@@ -159,12 +162,18 @@ export function QuestionForm({ open, title: titleForm, data, setOpen, setOpenToa
                                 />
                                 <Controller
                                     control={control}
-                                    defaultValue={data?.type}
                                     name="type"
+                                    defaultValue={data?.type ?? 'multiple-choice'}
                                     render={({ field }) => (
                                         <FormControl error={Boolean(errors.type)}>
                                             <InputLabel>Type</InputLabel>
-                                            <OutlinedInput {...field} label="Type" type="text" />
+                                            <Select label="Type" variant="outlined" {...field} >
+                                                {questionTypes.map((option) => (
+                                                    <MenuItem key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
                                             {errors.type ? <FormHelperText>{errors.type.message}</FormHelperText> : null}
                                         </FormControl>
                                     )}
