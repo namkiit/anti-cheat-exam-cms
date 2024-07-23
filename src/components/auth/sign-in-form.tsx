@@ -127,6 +127,16 @@ export function SignInForm(): React.JSX.Element {
           </Button>
         </Stack>
       </form>
+      <Alert color="warning">
+        Use email{' '}
+        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
+          namkiet3010@gmail.com
+        </Typography>{' '}
+        with password{' '}
+        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
+          namkiet3010
+        </Typography>
+      </Alert>
     </Stack>
   );
 }
