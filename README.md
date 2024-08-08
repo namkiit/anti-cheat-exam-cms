@@ -1,14 +1,6 @@
-# Auto-Proctoring Exam Backend 🌟
+# Auto-Proctoring Exam CMS 🌟
 
-A platform that aims to stop cheating in online exams with the power of AI and ML.
-  
-This is the my upgraded version of Prathamesh Mutkure's [Anti-Cheat Exam Web App](https://github.com/prathamesh-mutkure/anti-cheat-app-web) with new features:
-
-- Randomize Questions & Answers Order
-- Disable Copy Paste, Print Screen and Open DevTools Hotkeys
-- DevTools Detection & Protection
-- Content Management System for Managing Exams, Questions & Students
-- Credibility Score System & View Exam Results
+A content-management system that manages exams, questions and students in [Auto-Proctoring Exam Web App](https://github.com/namkiit/auto-proctoring-exam-web-app).
 
 <p  align="center">
 
@@ -32,7 +24,7 @@ This is the my upgraded version of Prathamesh Mutkure's [Anti-Cheat Exam Web App
 
 1. Clone the project
 
-   -  `https://github.com/namkiit/auto-proctoring-exam-web-app.git`
+   -  `https://github.com/namkiit/auto-proctoring-exam-cms.git`
 
 2. Install all the packages using yarn
 
